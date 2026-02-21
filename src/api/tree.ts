@@ -14,6 +14,7 @@ export async function fetchFullTree(
       owner,
       repo,
       ref: `heads/${branch}`,
+      headers: { 'If-None-Match': '' },
     })
 
     const commitSha = ref.object.sha
