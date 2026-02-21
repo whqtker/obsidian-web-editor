@@ -20,7 +20,7 @@ export async function fetchFile(
   try {
     const { data } = await octokit.rest.repos.getContent({ owner, repo, path })
     const file = data as GitHubFile
-    if (file.type !== 'file' || !file.content) {
+    if (file.type !== 'file' || file.content === undefined) {
       throw new Error(`${path}은(는) 파일이 아닙니다.`)
     }
     return { content: decodeBase64(file.content), sha: file.sha }
