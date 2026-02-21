@@ -14,6 +14,7 @@ interface TreeState {
 
 interface TreeActions {
   fetchTree: (owner: string, repo: string, branch: string) => Promise<void>
+  addNode: (path: string, sha: string) => void
   removeNode: (path: string) => void
   invalidate: () => void
 }
@@ -37,6 +38,14 @@ export const useTreeStore = create<TreeState & TreeActions>()((set, get) => ({
         error: err instanceof Error ? err.message : '파일 트리를 불러올 수 없습니다.',
       })
     }
+  },
+
+  addNode: (path: string, sha: string) => {
+    const { flatNodes } = get()
+    const newNode: GitHubTreeNode = { path, type: 'blob', sha, mode: '100644' }
+    const updated = [...flatNodes, newNode]
+    const tree = buildTreeFromFlat(updated)
+    set({ flatNodes: updated, tree })
   },
 
   removeNode: (path: string) => {
