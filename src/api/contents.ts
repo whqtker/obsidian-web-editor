@@ -55,7 +55,8 @@ export async function saveFile(params: {
       sha: params.sha,
       branch: params.branch,
     })
-    return { sha: (data.content as GitHubFile).sha }
+    if (!data.content) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
+    return { sha: data.content.sha }
   } catch (err: unknown) {
     if (err && typeof err === 'object' && 'status' in err && err.status === 409) {
       throw new ShaConflictError(params.path)
@@ -88,7 +89,8 @@ export async function createFile(params: {
       content: encodeBase64(params.content),
       branch: params.branch,
     })
-    return { sha: (data.content as GitHubFile).sha }
+    if (!data.content) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
+    return { sha: data.content.sha }
   } catch (err) {
     rethrowWithAuthCheck(err)
   }
@@ -118,7 +120,8 @@ export async function uploadBinaryFile(params: {
       content: params.base64Content,
       branch: params.branch,
     })
-    return { sha: (data.content as GitHubFile).sha }
+    if (!data.content) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
+    return { sha: data.content.sha }
   } catch (err) {
     rethrowWithAuthCheck(err)
   }
@@ -134,6 +137,10 @@ export async function deleteFile(params: {
 }): Promise<void> {
   const octokit = getOctokitClient()
   if (!octokit) throw new Error('인증이 필요합니다.')
+
+  if (params.path.startsWith('.obsidian/')) {
+    throw new Error('.obsidian/ 디렉토리에는 쓸 수 없습니다.')
+  }
 
   try {
     await octokit.rest.repos.deleteFile({
