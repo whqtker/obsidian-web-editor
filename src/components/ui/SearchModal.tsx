@@ -44,8 +44,8 @@ export function SearchModal({ onSelect, onClose }: SearchModalProps) {
   useEffect(() => {
     const list = listRef.current
     if (!list) return
-    const selected = list.children[selectedIdx] as HTMLElement | undefined
-    selected?.scrollIntoView({ block: 'nearest' })
+    const selected = list.children[selectedIdx]
+    if (selected instanceof HTMLElement) selected.scrollIntoView({ block: 'nearest' })
   }, [selectedIdx])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

@@ -37,7 +37,8 @@ export async function fetchAuthenticatedUser(token: string): Promise<{
 }
 
 export function buildOAuthUrl(state: string): string {
-  const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID as string
+  const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID
+  if (!clientId) throw new Error('VITE_GITHUB_CLIENT_ID가 설정되지 않았습니다.')
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: window.location.origin,
