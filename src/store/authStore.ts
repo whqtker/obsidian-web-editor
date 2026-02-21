@@ -98,6 +98,11 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         avatarUrl: state.avatarUrl,
         isAuthenticated: state.isAuthenticated,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state?.token) {
+          createOctokitClient(state.token)
+        }
+      },
     },
   ),
 )
