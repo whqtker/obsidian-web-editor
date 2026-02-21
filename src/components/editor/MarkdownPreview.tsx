@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import remarkFrontmatter from 'remark-frontmatter'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeSlug from 'rehype-slug'
+import rehypeRaw from 'rehype-raw'
 import { useTreeStore } from '@/store/treeStore'
 import { resolveWikiLink } from '@/utils/wikilink'
 
@@ -46,12 +47,29 @@ function replaceWikiLinks(content: string, allPaths: string[]): string {
   })
 }
 
+const INLINE_TAG_RE = /(?:^|\s)#([a-zA-Z\u3131-\uD79D][\w\u3131-\uD79D/\-]*)/g
+
+/**
+ * Replace inline #tags with styled HTML spans for preview.
+ * Skips code blocks to avoid false matches.
+ */
+function replaceInlineTags(content: string): string {
+  const parts = content.split(/(```[\s\S]*?```|`[^`]*`)/g)
+  return parts.map((part, i) => {
+    if (i % 2 === 1) return part
+    return part.replace(INLINE_TAG_RE, (match, tag) => {
+      const leading = match.startsWith('#') ? '' : match[0]
+      return `${leading}<span class="obsidian-tag">#${tag}</span>`
+    })
+  }).join('')
+}
+
 export function MarkdownPreview({ content, onNavigate }: MarkdownPreviewProps) {
   const flatNodes = useTreeStore((s) => s.flatNodes)
   const allPaths = useMemo(() => flatNodes.map((n) => n.path), [flatNodes])
 
   const processed = useMemo(
-    () => replaceWikiLinks(content, allPaths),
+    () => replaceInlineTags(replaceWikiLinks(content, allPaths)),
     [content, allPaths],
   )
 
@@ -78,7 +96,7 @@ export function MarkdownPreview({ content, onNavigate }: MarkdownPreviewProps) {
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkFrontmatter]}
-        rehypePlugins={[rehypeHighlight, rehypeSlug]}
+        rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeSlug]}
       >
         {processed}
       </ReactMarkdown>
