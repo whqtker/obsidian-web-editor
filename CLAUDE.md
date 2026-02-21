@@ -34,6 +34,31 @@ src/test/      — 테스트 (tsconfig.test.json으로 분리)
 api/           — Vercel serverless functions (api/auth/callback.ts)
 scripts/       — 로컬 개발 도구 (dev-auth-server.mjs)
 
+## Code Quality Standards
+
+### TypeScript 타입 안전성
+- `any` 타입 사용 금지 — `unknown` + 타입 가드 또는 명시적 타입 사용
+- 타입 단언(`as`) 최소화 — 타입 가드 함수 우선
+- API 응답은 반드시 타입 검증 후 사용
+- Store: State와 Actions 인터페이스 분리, `create<T>()(...)` 커리 패턴 유지
+
+### 코드 간결성
+- 단일 책임 원칙: 파일/함수 당 하나의 역할
+- 중복 코드 발견 시 `src/utils/` 또는 `src/hooks/`로 추출
+- 불필요한 래퍼/추상화 금지 — 현재 필요한 최소한의 코드만 작성
+- 조기 반환(early return) 패턴으로 중첩 줄이기
+
+### 컴포넌트 컨벤션
+- 함수 컴포넌트 + named export만 사용 (ErrorBoundary 제외)
+- Props 인터페이스는 컴포넌트 파일 내에서 정의
+- Store 소비: 단일 값은 selector, 여러 값은 destructure
+- 이벤트 핸들러: 자식에 전달 시 useCallback 사용
+
+### 에러 처리
+- API 호출: rethrowWithAuthCheck(err) 필수
+- 사용자 메시지: 한국어
+- Store: error 상태를 err instanceof Error로 안전하게 추출
+
 ## Conventions
 - 경로 별칭: `@/` → `src/`
 - npm install 시 반드시 `--legacy-peer-deps` 사용 (`.npmrc`에 설정됨)
