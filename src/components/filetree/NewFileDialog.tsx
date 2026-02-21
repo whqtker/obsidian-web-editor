@@ -16,7 +16,7 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
   const [isCreating, setIsCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { owner, repo, branch } = useRepoStore()
-  const { fetchTree } = useTreeStore()
+  const addNode = useTreeStore((s) => s.addNode)
   const { openPath } = useEditorStore()
   const addToast = useToastStore((s) => s.addToast)
 
@@ -44,7 +44,7 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
     setIsCreating(true)
     setError(null)
     try {
-      await createFile({
+      const { sha } = await createFile({
         owner,
         repo,
         path: fullPath,
@@ -52,7 +52,7 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
         message: `Create ${basename(fullPath)}`,
         branch,
       })
-      await fetchTree(owner, repo, branch)
+      addNode(fullPath, sha)
       await openPath(owner, repo, fullPath)
       addToast('success', `${basename(fullPath)} 파일이 생성되었습니다.`)
       onClose()
