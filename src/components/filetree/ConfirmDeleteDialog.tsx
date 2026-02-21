@@ -45,8 +45,8 @@ export function ConfirmDeleteDialog({ path, sha, onClose }: ConfirmDeleteDialogP
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-gray-800 rounded-lg p-4 w-full max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-[fadeIn_0.15s_ease-out]" onClick={onClose}>
+      <div className="bg-gray-800 rounded-lg p-4 w-full max-w-sm mx-4 animate-[modalIn_0.2s_ease-out]" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-sm font-semibold text-white mb-2">파일 삭제</h2>
         <p className="text-sm text-gray-300 mb-1">
           정말 삭제하시겠습니까?
@@ -56,7 +56,7 @@ export function ConfirmDeleteDialog({ path, sha, onClose }: ConfirmDeleteDialogP
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors"
+            className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
             disabled={isDeleting}
           >
             취소
@@ -64,7 +64,7 @@ export function ConfirmDeleteDialog({ path, sha, onClose }: ConfirmDeleteDialogP
           <button
             onClick={handleDelete}
             disabled={isDeleting}
-            className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors"
+            className="px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors focus:outline-none focus:ring-1 focus:ring-red-500"
           >
             {isDeleting ? '삭제 중...' : '삭제'}
           </button>

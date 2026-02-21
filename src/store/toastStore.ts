@@ -6,6 +6,7 @@ export interface Toast {
   id: string
   type: ToastType
   message: string
+  removing?: boolean
 }
 
 interface ToastState {
@@ -16,7 +17,7 @@ interface ToastState {
 
 let nextId = 0
 
-export const useToastStore = create<ToastState>()((set) => ({
+export const useToastStore = create<ToastState>()((set, get) => ({
   toasts: [],
 
   addToast: (type, message) => {
@@ -24,16 +25,17 @@ export const useToastStore = create<ToastState>()((set) => ({
     set((state) => ({
       toasts: [...state.toasts, { id, type, message }],
     }))
-    setTimeout(() => {
-      set((state) => ({
-        toasts: state.toasts.filter((t) => t.id !== id),
-      }))
-    }, 4000)
+    setTimeout(() => get().removeToast(id), 4000)
   },
 
   removeToast: (id) => {
     set((state) => ({
-      toasts: state.toasts.filter((t) => t.id !== id),
+      toasts: state.toasts.map((t) => (t.id === id ? { ...t, removing: true } : t)),
     }))
+    setTimeout(() => {
+      set((state) => ({
+        toasts: state.toasts.filter((t) => t.id !== id),
+      }))
+    }, 200)
   },
 }))

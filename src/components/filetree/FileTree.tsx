@@ -34,7 +34,7 @@ export function FileTree({ selectedPath, onSelect }: FileTreeProps) {
       <div className="px-2 py-1.5 flex justify-end">
         <button
           onClick={() => setNewFileDir('')}
-          className="text-xs text-gray-500 hover:text-gray-300 transition-colors px-1.5"
+          className="text-xs text-gray-500 hover:text-gray-300 transition-colors px-1.5 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
           title="루트에 새 파일 생성"
         >
           + 새 파일

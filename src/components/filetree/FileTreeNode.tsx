@@ -41,7 +41,7 @@ export function FileTreeNode({ node, depth, selectedPath, onSelect, onNewFile }:
         <button
           onClick={handleClick}
           onContextMenu={handleContextMenu}
-          className="flex-1 text-left px-2 py-1 text-sm flex items-center gap-1.5 min-w-0"
+          className="flex-1 text-left px-3 py-1.5 text-sm flex items-center gap-1.5 min-w-0 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
         >
           <span className="shrink-0 w-4 text-center text-xs text-gray-500">
@@ -54,7 +54,7 @@ export function FileTreeNode({ node, depth, selectedPath, onSelect, onNewFile }:
         {isDir && (
           <button
             onClick={(e) => { e.stopPropagation(); onNewFile(node.path) }}
-            className="hidden group-hover:block px-1.5 text-gray-500 hover:text-gray-300 text-xs shrink-0"
+            className="hidden group-hover:block px-1.5 text-gray-500 hover:text-gray-300 text-xs shrink-0 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded"
             title="새 파일"
           >
             +
@@ -65,7 +65,7 @@ export function FileTreeNode({ node, depth, selectedPath, onSelect, onNewFile }:
         {!isDir && (
           <button
             onClick={(e) => { e.stopPropagation(); setShowDelete(true) }}
-            className="hidden group-hover:block px-1.5 text-gray-500 hover:text-red-400 text-xs shrink-0"
+            className="hidden group-hover:block px-1.5 text-gray-500 hover:text-red-400 text-xs shrink-0 focus:outline-none focus:ring-1 focus:ring-red-500 rounded"
             title="삭제"
           >
             ×
