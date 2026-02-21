@@ -1,4 +1,3 @@
-import type { Frontmatter } from '@/types/obsidian'
 import { parseFrontmatter } from '@/utils/frontmatter'
 
 /**
