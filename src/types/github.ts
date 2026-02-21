@@ -40,3 +40,12 @@ export interface RateLimitInfo {
   resetAt: Date;
   used: number;
 }
+
+export interface UserRepo {
+  owner: string;
+  name: string;
+  fullName: string;
+  private: boolean;
+  updatedAt: string;
+  description: string | null;
+}
