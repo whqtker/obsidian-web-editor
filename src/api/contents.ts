@@ -90,6 +90,32 @@ export async function createFile(params: {
   return { sha: (data.content as GitHubFile).sha }
 }
 
+export async function uploadBinaryFile(params: {
+  owner: string
+  repo: string
+  path: string
+  base64Content: string
+  message: string
+  branch?: string
+}): Promise<{ sha: string }> {
+  const octokit = getOctokitClient()
+  if (!octokit) throw new Error('인증이 필요합니다.')
+
+  if (params.path.startsWith('.obsidian/')) {
+    throw new Error('.obsidian/ 디렉토리에는 쓸 수 없습니다.')
+  }
+
+  const { data } = await octokit.rest.repos.createOrUpdateFileContents({
+    owner: params.owner,
+    repo: params.repo,
+    path: params.path,
+    message: params.message,
+    content: params.base64Content,
+    branch: params.branch,
+  })
+  return { sha: (data.content as GitHubFile).sha }
+}
+
 export async function deleteFile(params: {
   owner: string
   repo: string
