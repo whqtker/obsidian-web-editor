@@ -22,7 +22,6 @@ interface AuthActions {
   initiateOAuth: () => void
   handleOAuthCallback: (code: string, state: string) => Promise<void>
   logout: () => void
-  rehydrate: () => void
   handleAuthError: () => void
 }
 
@@ -71,22 +70,9 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         set({ token: null, username: null, avatarUrl: null, isAuthenticated: false, error: null })
       },
 
-      rehydrate: () => {
-        const { token } = get()
-        if (token) {
-          createOctokitClient(token)
-        }
-      },
-
       handleAuthError: () => {
-        clearOctokitClient()
-        set({
-          token: null,
-          username: null,
-          avatarUrl: null,
-          isAuthenticated: false,
-          error: '세션이 만료되었습니다. 다시 로그인해주세요.',
-        })
+        get().logout()
+        set({ error: '세션이 만료되었습니다. 다시 로그인해주세요.' })
       },
     }),
     {

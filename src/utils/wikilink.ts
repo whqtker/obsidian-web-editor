@@ -1,40 +1,37 @@
-import type { WikiLink } from '@/types/obsidian'
 import { basename } from '@/utils/pathUtils'
 
 const WIKILINK_RE = /\[\[([^\]]+)\]\]/g
 
 /**
- * Parse all wikilinks from markdown content.
- * Supports: [[target]], [[target|display]], [[target#heading]]
+ * Replace [[wikilinks]] with markdown links for react-markdown to render.
+ * Unresolved links get a strikethrough style.
  */
-export function parseWikiLinks(content: string): WikiLink[] {
-  const links: WikiLink[] = []
-  let match: RegExpExecArray | null
-
-  while ((match = WIKILINK_RE.exec(content)) !== null) {
-    const raw = match[0]
-    let inner = match[1]
+export function replaceWikiLinks(content: string, allPaths: string[]): string {
+  return content.replace(WIKILINK_RE, (_match, inner: string) => {
+    let target = inner
     let display: string | undefined
 
-    // [[target|display]]
     const pipeIdx = inner.indexOf('|')
     if (pipeIdx !== -1) {
       display = inner.slice(pipeIdx + 1)
-      inner = inner.slice(0, pipeIdx)
+      target = inner.slice(0, pipeIdx)
     }
 
-    // [[target#heading]]
-    let heading: string | undefined
-    const hashIdx = inner.indexOf('#')
+    const hashIdx = target.indexOf('#')
+    let heading = ''
     if (hashIdx !== -1) {
-      heading = inner.slice(hashIdx + 1)
-      inner = inner.slice(0, hashIdx)
+      heading = target.slice(hashIdx)
+      target = target.slice(0, hashIdx)
     }
 
-    links.push({ raw, target: inner, display, heading })
-  }
+    const resolved = resolveWikiLink(target, allPaths)
+    const label = display || target || heading.slice(1)
 
-  return links
+    if (resolved) {
+      return `[${label}](wikilink:${resolved}${heading})`
+    }
+    return `~~${label}~~`
+  })
 }
 
 /**

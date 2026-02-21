@@ -26,7 +26,7 @@ export function wikilinkCompletion(getFilePaths: () => string[]) {
         if (afterOpen.includes(']]')) return null
 
         // Get query (text after [[ , before | if present)
-        let query = afterOpen
+        const query = afterOpen
         const pipeIdx = query.indexOf('|')
         if (pipeIdx !== -1) {
           // After pipe = display text, no completion needed

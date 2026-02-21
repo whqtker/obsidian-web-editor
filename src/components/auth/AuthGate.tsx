@@ -8,7 +8,7 @@ interface AuthGateProps {
 }
 
 export function AuthGate({ children }: AuthGateProps) {
-  const { isAuthenticated, isExchanging, handleOAuthCallback, rehydrate } = useAuthStore()
+  const { isAuthenticated, isExchanging, handleOAuthCallback } = useAuthStore()
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -18,10 +18,8 @@ export function AuthGate({ children }: AuthGateProps) {
     if (code && state) {
       window.history.replaceState({}, '', window.location.pathname)
       handleOAuthCallback(code, state)
-    } else {
-      rehydrate()
     }
-  }, [handleOAuthCallback, rehydrate])
+  }, [handleOAuthCallback])
 
   if (isExchanging) {
     return (

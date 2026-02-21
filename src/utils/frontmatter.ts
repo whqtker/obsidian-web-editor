@@ -14,7 +14,7 @@ export function parseFrontmatter(content: string): {
 
   try {
     const parsed = yaml.load(match[1])
-    const frontmatter = (parsed && typeof parsed === 'object' ? parsed : null) as Frontmatter | null
+    const frontmatter = (parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null) as Frontmatter | null
     const body = content.slice(match[0].length).replace(/^\r?\n/, '')
     return { frontmatter, body }
   } catch {

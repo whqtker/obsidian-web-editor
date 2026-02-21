@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { fetchFile, saveFile } from '@/api/contents'
+import { rethrowWithAuthCheck } from '@/api/github'
 import { basename } from '@/utils/pathUtils'
 import type { OpenFile } from '@/types/editor'
 
@@ -45,6 +46,7 @@ export const useEditorStore = create<EditorState & EditorActions>()((set, get) =
         isLoading: false,
         error: err instanceof Error ? err.message : '파일을 열 수 없습니다.',
       })
+      rethrowWithAuthCheck(err)
     }
   },
 
@@ -81,7 +83,7 @@ export const useEditorStore = create<EditorState & EditorActions>()((set, get) =
         isSaving: false,
         error: err instanceof Error ? err.message : '저장에 실패했습니다.',
       })
-      throw err
+      rethrowWithAuthCheck(err)
     }
   },
 

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { fetchFullTree } from '@/api/tree'
+import { rethrowWithAuthCheck } from '@/api/github'
 import { buildTreeFromFlat } from '@/utils/pathUtils'
 import type { GitHubTreeNode } from '@/types/github'
 import type { TreeNode } from '@/types/obsidian'
@@ -37,6 +38,7 @@ export const useTreeStore = create<TreeState & TreeActions>()((set, get) => ({
         isLoading: false,
         error: err instanceof Error ? err.message : '파일 트리를 불러올 수 없습니다.',
       })
+      rethrowWithAuthCheck(err)
     }
   },
 
