@@ -5,30 +5,29 @@ import { useAuthStore } from '../store/authStore'
 
 describe('App', () => {
   beforeEach(() => {
-    localStorage.clear()
+    sessionStorage.clear()
     useAuthStore.setState({
-      pat: null,
+      token: null,
       username: null,
       avatarUrl: null,
       isAuthenticated: false,
-      isValidating: false,
+      isExchanging: false,
       error: null,
     })
   })
 
-  it('shows PatForm when not authenticated', () => {
+  it('shows OAuthLoginScreen when not authenticated', () => {
     render(
       <MemoryRouter>
         <App />
       </MemoryRouter>
     )
-    expect(screen.getByLabelText(/Personal Access Token/i)).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/ghp_/i)).toBeInTheDocument()
+    expect(screen.getByText('Login with GitHub')).toBeInTheDocument()
   })
 
   it('shows RepoSelector when authenticated but no repo configured', () => {
     useAuthStore.setState({
-      pat: 'ghp_test',
+      token: 'gho_test',
       username: 'testuser',
       avatarUrl: '',
       isAuthenticated: true,
@@ -40,7 +39,5 @@ describe('App', () => {
       </MemoryRouter>
     )
     expect(screen.getByText('Vault 레포 설정')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('owner')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText('repo')).toBeInTheDocument()
   })
 })
