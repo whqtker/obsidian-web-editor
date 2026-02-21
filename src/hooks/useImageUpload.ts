@@ -24,7 +24,7 @@ function isImageFile(file: File): boolean {
 
 function generateImagePath(file: File): string {
   const timestamp = Date.now()
-  const safeName = file.name.replace(/[^a-zA-Z0-9._\-]/g, '_')
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
   return `attachments/${timestamp}_${safeName}`
 }
 

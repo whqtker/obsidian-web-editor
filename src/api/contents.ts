@@ -55,8 +55,9 @@ export async function saveFile(params: {
       sha: params.sha,
       branch: params.branch,
     })
-    if (!data.content) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
-    return { sha: data.content.sha }
+    const sha = data.content?.sha
+    if (!sha) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
+    return { sha }
   } catch (err: unknown) {
     if (err && typeof err === 'object' && 'status' in err && err.status === 409) {
       throw new ShaConflictError(params.path)
@@ -89,8 +90,9 @@ export async function createFile(params: {
       content: encodeBase64(params.content),
       branch: params.branch,
     })
-    if (!data.content) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
-    return { sha: data.content.sha }
+    const sha = data.content?.sha
+    if (!sha) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
+    return { sha }
   } catch (err) {
     rethrowWithAuthCheck(err)
   }
@@ -120,8 +122,9 @@ export async function uploadBinaryFile(params: {
       content: params.base64Content,
       branch: params.branch,
     })
-    if (!data.content) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
-    return { sha: data.content.sha }
+    const sha = data.content?.sha
+    if (!sha) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
+    return { sha }
   } catch (err) {
     rethrowWithAuthCheck(err)
   }

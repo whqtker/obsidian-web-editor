@@ -1,4 +1,4 @@
-const INLINE_TAG_RE = /(?:^|\s)#([a-zA-Z\u3131-\uD79D][\w\u3131-\uD79D/\-]*)/g
+const INLINE_TAG_RE = /(?:^|\s)#([a-zA-Z\u3131-\uD79D][\w\u3131-\uD79D/-]*)/g
 
 /**
  * Replace inline #tags with styled spans for preview rendering.
