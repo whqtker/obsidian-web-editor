@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTreeStore } from '@/store/treeStore'
 import { useRepoStore } from '@/store/repoStore'
 import { FileTreeNode } from './FileTreeNode'
+import { NewFileDialog } from './NewFileDialog'
 
 interface FileTreeProps {
   selectedPath: string | null
@@ -11,6 +12,7 @@ interface FileTreeProps {
 export function FileTree({ selectedPath, onSelect }: FileTreeProps) {
   const { owner, repo, branch } = useRepoStore()
   const { tree, isLoading, error, truncated, fetchTree } = useTreeStore()
+  const [newFileDir, setNewFileDir] = useState<string | null>(null)
 
   useEffect(() => {
     if (owner && repo && branch) {
@@ -26,26 +28,45 @@ export function FileTree({ selectedPath, onSelect }: FileTreeProps) {
     return <p className="px-3 py-2 text-sm text-red-400">{error}</p>
   }
 
-  if (tree.length === 0) {
-    return <p className="px-3 py-2 text-sm text-gray-500">파일이 없습니다.</p>
-  }
-
   return (
-    <div className="flex flex-col overflow-y-auto">
+    <div className="flex flex-col">
+      <div className="px-2 py-1.5 flex justify-end">
+        <button
+          onClick={() => setNewFileDir('')}
+          className="text-xs text-gray-500 hover:text-gray-300 transition-colors px-1.5"
+          title="루트에 새 파일 생성"
+        >
+          + 새 파일
+        </button>
+      </div>
+
       {truncated && (
         <p className="px-3 py-1 text-xs text-yellow-500">
           레포가 너무 커서 일부만 표시됩니다.
         </p>
       )}
-      {tree.map((node) => (
-        <FileTreeNode
-          key={node.path}
-          node={node}
-          depth={0}
-          selectedPath={selectedPath}
-          onSelect={onSelect}
+
+      {tree.length === 0 ? (
+        <p className="px-3 py-2 text-sm text-gray-500">파일이 없습니다.</p>
+      ) : (
+        tree.map((node) => (
+          <FileTreeNode
+            key={node.path}
+            node={node}
+            depth={0}
+            selectedPath={selectedPath}
+            onSelect={onSelect}
+            onNewFile={setNewFileDir}
+          />
+        ))
+      )}
+
+      {newFileDir !== null && (
+        <NewFileDialog
+          directory={newFileDir}
+          onClose={() => setNewFileDir(null)}
         />
-      ))}
+      )}
     </div>
   )
 }
