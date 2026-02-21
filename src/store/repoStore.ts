@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { getOctokitClient } from '@/api/github'
+import { getOctokitClient, rethrowWithAuthCheck } from '@/api/github'
 import type { UserRepo } from '@/types/github'
 
 interface RepoState {
@@ -65,7 +65,7 @@ export const useRepoStore = create<RepoState & RepoActions>()(
             isValidating: false,
             error: err instanceof Error ? err.message : '레포 검증에 실패했습니다.',
           })
-          throw err
+          rethrowWithAuthCheck(err)
         }
       },
 
@@ -115,6 +115,7 @@ export const useRepoStore = create<RepoState & RepoActions>()(
             isLoadingRepos: false,
             reposError: err instanceof Error ? err.message : '레포 목록을 불러올 수 없습니다.',
           })
+          rethrowWithAuthCheck(err)
         }
       },
     }),
