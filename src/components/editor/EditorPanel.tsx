@@ -8,9 +8,14 @@ import { EditorToolbar } from './EditorToolbar'
 import { Spinner } from '@/components/ui/Spinner'
 
 export function EditorPanel() {
-  const { openFile, isLoading, error, showPreview, updateContent, save } = useEditorStore()
+  const { openFile, isLoading, error, showPreview, updateContent, save, openPath } = useEditorStore()
   const { owner, repo, branch } = useRepoStore()
   const addToast = useToastStore((s) => s.addToast)
+
+  const handleNavigate = useCallback(
+    (path: string) => { openPath(owner, repo, path) },
+    [openPath, owner, repo],
+  )
 
   const handleSave = useCallback(async () => {
     try {
@@ -65,7 +70,7 @@ export function EditorPanel() {
         </div>
         {showPreview && (
           <div className="w-1/2 min-h-0 overflow-hidden">
-            <MarkdownPreview content={openFile.content} />
+            <MarkdownPreview content={openFile.content} onNavigate={handleNavigate} />
           </div>
         )}
       </div>
