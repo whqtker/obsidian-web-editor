@@ -53,7 +53,7 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
         branch,
       })
       await fetchTree(owner, repo, branch)
-      openPath(owner, repo, fullPath)
+      await openPath(owner, repo, fullPath)
       addToast('success', `${basename(fullPath)} 파일이 생성되었습니다.`)
       onClose()
     } catch (err) {
