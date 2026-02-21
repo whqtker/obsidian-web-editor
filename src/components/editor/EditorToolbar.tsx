@@ -30,7 +30,7 @@ export function EditorToolbar() {
       <div className="flex items-center gap-2">
         <button
           onClick={togglePreview}
-          className={`px-2 py-1 text-xs rounded transition-colors ${
+          className={`px-3 py-1.5 text-xs rounded transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
             showPreview
               ? 'bg-gray-700 text-white'
               : 'text-gray-400 hover:text-gray-200'
@@ -41,13 +41,13 @@ export function EditorToolbar() {
         <button
           onClick={handleSave}
           disabled={!openFile.isDirty || isSaving}
-          className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors"
+          className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           {isSaving ? '저장 중...' : '저장'}
         </button>
         <button
           onClick={closeFile}
-          className="px-2 py-1 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
           닫기
         </button>

@@ -36,7 +36,7 @@ export function RepoSelector() {
           <span className="text-sm text-gray-300 font-mono">{owner}/{repo}</span>
           <button
             onClick={clearRepo}
-            className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             변경
           </button>
@@ -45,7 +45,7 @@ export function RepoSelector() {
           <select
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
-            className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm text-white"
+            className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             {branches.map((b) => (
               <option key={b} value={b}>{b}</option>
@@ -65,7 +65,7 @@ export function RepoSelector() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="레포 검색..."
-        className="w-full px-2 py-1.5 bg-gray-700 border border-gray-600 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full px-3 py-1.5 bg-gray-700 border border-gray-600 rounded text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         autoFocus
       />
 
@@ -88,7 +88,7 @@ export function RepoSelector() {
                 <button
                   onClick={() => setRepo(r.owner, r.name)}
                   disabled={isValidating}
-                  className="w-full text-left px-3 py-2 hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                  className="w-full text-left px-3 py-2 hover:bg-gray-700 disabled:opacity-50 transition-colors focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-white font-mono">{r.fullName}</span>

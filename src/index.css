@@ -31,6 +31,21 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95) translateY(-6px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(8px); }
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+
 .obsidian-tag {
   background-color: rgba(59, 130, 246, 0.15);
   color: #93c5fd;

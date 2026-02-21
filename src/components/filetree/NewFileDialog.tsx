@@ -63,8 +63,8 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
-      <div className="bg-gray-800 rounded-lg p-4 w-full max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-[fadeIn_0.15s_ease-out]" onClick={onClose}>
+      <div className="bg-gray-800 rounded-lg p-4 w-full max-w-sm mx-4 animate-[modalIn_0.2s_ease-out]" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-sm font-semibold text-white mb-3">새 파일 생성</h2>
         {directory && (
           <p className="text-xs text-gray-500 mb-2 font-mono">{directory}/</p>
@@ -84,7 +84,7 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors"
+              className="px-3 py-1.5 text-xs text-gray-400 hover:text-gray-200 transition-colors rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
               disabled={isCreating}
             >
               취소
@@ -92,7 +92,7 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
             <button
               type="submit"
               disabled={isCreating || !normalizedName}
-              className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors"
+              className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               {isCreating ? '생성 중...' : '생성'}
             </button>

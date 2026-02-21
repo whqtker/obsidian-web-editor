@@ -17,12 +17,12 @@ export function ToastContainer() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`${typeStyles[toast.type]} border rounded-lg px-4 py-3 text-sm text-white shadow-lg flex items-start gap-2 animate-[fadeIn_0.2s_ease-out]`}
+          className={`${typeStyles[toast.type]} border rounded-lg px-4 py-3 text-sm text-white shadow-lg flex items-start gap-2 ${toast.removing ? 'animate-[fadeOut_0.2s_ease-in]' : 'animate-[fadeIn_0.2s_ease-out]'}`}
         >
           <span className="flex-1 break-words">{toast.message}</span>
           <button
             onClick={() => removeToast(toast.id)}
-            className="text-gray-400 hover:text-white text-xs shrink-0 mt-0.5"
+            className="text-gray-400 hover:text-white text-xs shrink-0 mt-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded transition-colors"
           >
             ✕
           </button>
