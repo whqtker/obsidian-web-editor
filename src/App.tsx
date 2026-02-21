@@ -1,15 +1,20 @@
-import { useState } from 'react'
 import { AuthGate } from '@/components/auth/AuthGate'
 import { RepoSelector } from '@/components/layout/RepoSelector'
 import { FileTree } from '@/components/filetree/FileTree'
+import { EditorPanel } from '@/components/editor/EditorPanel'
 import { useAuthStore } from '@/store/authStore'
 import { useRepoStore } from '@/store/repoStore'
+import { useEditorStore } from '@/store/editorStore'
 
 function Dashboard() {
   const { username, logout } = useAuthStore()
   const { owner, repo, branch } = useRepoStore()
+  const { openFile, openPath } = useEditorStore()
   const isRepoConfigured = owner && repo
-  const [selectedPath, setSelectedPath] = useState<string | null>(null)
+
+  const handleFileSelect = (path: string) => {
+    openPath(owner, repo, path)
+  }
 
   if (!isRepoConfigured) {
     return (
@@ -41,26 +46,19 @@ function Dashboard() {
       </header>
 
       <div className="flex-1 flex min-h-0">
-        {/* Sidebar */}
         <aside className="w-64 border-r border-gray-800 flex flex-col shrink-0">
           <div className="px-3 py-2 border-b border-gray-800">
             <RepoSelector />
           </div>
           <div className="flex-1 overflow-y-auto py-1">
-            <FileTree selectedPath={selectedPath} onSelect={setSelectedPath} />
+            <FileTree
+              selectedPath={openFile?.path ?? null}
+              onSelect={handleFileSelect}
+            />
           </div>
         </aside>
 
-        {/* Main content */}
-        <main className="flex-1 flex items-center justify-center">
-          {selectedPath ? (
-            <p className="text-gray-400 text-sm">
-              선택: <span className="font-mono">{selectedPath}</span>
-            </p>
-          ) : (
-            <p className="text-gray-600 text-sm">파일을 선택하세요</p>
-          )}
-        </main>
+        <EditorPanel />
       </div>
     </div>
   )
