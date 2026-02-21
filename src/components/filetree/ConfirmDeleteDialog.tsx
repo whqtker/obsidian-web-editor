@@ -16,7 +16,7 @@ export function ConfirmDeleteDialog({ path, sha, onClose }: ConfirmDeleteDialogP
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { owner, repo, branch } = useRepoStore()
-  const { fetchTree } = useTreeStore()
+  const removeNode = useTreeStore((s) => s.removeNode)
   const { openFile, closeFile } = useEditorStore()
   const addToast = useToastStore((s) => s.addToast)
 
@@ -35,7 +35,7 @@ export function ConfirmDeleteDialog({ path, sha, onClose }: ConfirmDeleteDialogP
       if (openFile?.path === path) {
         closeFile()
       }
-      await fetchTree(owner, repo, branch)
+      removeNode(path)
       addToast('success', `${basename(path)} 파일이 삭제되었습니다.`)
       onClose()
     } catch (err) {

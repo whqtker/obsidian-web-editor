@@ -14,10 +14,11 @@ interface TreeState {
 
 interface TreeActions {
   fetchTree: (owner: string, repo: string, branch: string) => Promise<void>
+  removeNode: (path: string) => void
   invalidate: () => void
 }
 
-export const useTreeStore = create<TreeState & TreeActions>()((set) => ({
+export const useTreeStore = create<TreeState & TreeActions>()((set, get) => ({
   flatNodes: [],
   tree: [],
   isLoading: false,
@@ -36,6 +37,13 @@ export const useTreeStore = create<TreeState & TreeActions>()((set) => ({
         error: err instanceof Error ? err.message : '파일 트리를 불러올 수 없습니다.',
       })
     }
+  },
+
+  removeNode: (path: string) => {
+    const { flatNodes } = get()
+    const filtered = flatNodes.filter((n) => n.path !== path)
+    const tree = buildTreeFromFlat(filtered)
+    set({ flatNodes: filtered, tree })
   },
 
   invalidate: () => {
