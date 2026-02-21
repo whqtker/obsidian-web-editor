@@ -6,62 +6,12 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeSlug from 'rehype-slug'
 import rehypeRaw from 'rehype-raw'
 import { useTreeStore } from '@/store/treeStore'
-import { resolveWikiLink } from '@/utils/wikilink'
+import { replaceWikiLinks } from '@/utils/wikilink'
+import { replaceTagsForPreview } from '@/utils/tags'
 
 interface MarkdownPreviewProps {
   content: string
   onNavigate?: (path: string) => void
-}
-
-const WIKILINK_RE = /\[\[([^\]]+)\]\]/g
-
-/**
- * Replace [[wikilinks]] with markdown links for react-markdown to render.
- * Unresolved links get a strikethrough style.
- */
-function replaceWikiLinks(content: string, allPaths: string[]): string {
-  return content.replace(WIKILINK_RE, (_match, inner: string) => {
-    let target = inner
-    let display: string | undefined
-
-    const pipeIdx = inner.indexOf('|')
-    if (pipeIdx !== -1) {
-      display = inner.slice(pipeIdx + 1)
-      target = inner.slice(0, pipeIdx)
-    }
-
-    const hashIdx = target.indexOf('#')
-    let heading = ''
-    if (hashIdx !== -1) {
-      heading = target.slice(hashIdx)
-      target = target.slice(0, hashIdx)
-    }
-
-    const resolved = resolveWikiLink(target, allPaths)
-    const label = display || target || heading.slice(1)
-
-    if (resolved) {
-      return `[${label}](wikilink:${resolved}${heading})`
-    }
-    return `~~${label}~~`
-  })
-}
-
-const INLINE_TAG_RE = /(?:^|\s)#([a-zA-Z\u3131-\uD79D][\w\u3131-\uD79D/\-]*)/g
-
-/**
- * Replace inline #tags with styled HTML spans for preview.
- * Skips code blocks to avoid false matches.
- */
-function replaceInlineTags(content: string): string {
-  const parts = content.split(/(```[\s\S]*?```|`[^`]*`)/g)
-  return parts.map((part, i) => {
-    if (i % 2 === 1) return part
-    return part.replace(INLINE_TAG_RE, (match, tag) => {
-      const leading = match.startsWith('#') ? '' : match[0]
-      return `${leading}<span class="obsidian-tag">#${tag}</span>`
-    })
-  }).join('')
 }
 
 export function MarkdownPreview({ content, onNavigate }: MarkdownPreviewProps) {
@@ -69,7 +19,7 @@ export function MarkdownPreview({ content, onNavigate }: MarkdownPreviewProps) {
   const allPaths = useMemo(() => flatNodes.map((n) => n.path), [flatNodes])
 
   const processed = useMemo(
-    () => replaceInlineTags(replaceWikiLinks(content, allPaths)),
+    () => replaceTagsForPreview(replaceWikiLinks(content, allPaths)),
     [content, allPaths],
   )
 
