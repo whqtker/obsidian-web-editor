@@ -1,6 +1,18 @@
 import { Octokit } from 'octokit'
 
 let octokitInstance: Octokit | null = null
+let authErrorHandler: (() => void) | null = null
+
+export function setAuthErrorHandler(handler: () => void): void {
+  authErrorHandler = handler
+}
+
+export function rethrowWithAuthCheck(err: unknown): never {
+  if (err && typeof err === 'object' && 'status' in err && err.status === 401) {
+    authErrorHandler?.()
+  }
+  throw err
+}
 
 export function createOctokitClient(token: string): Octokit {
   octokitInstance = new Octokit({ auth: token })

@@ -6,6 +6,7 @@ import {
   exchangeCodeForToken,
   createOctokitClient,
   clearOctokitClient,
+  setAuthErrorHandler,
 } from '@/api/github'
 
 interface AuthState {
@@ -100,3 +101,5 @@ export const useAuthStore = create<AuthState & AuthActions>()(
     },
   ),
 )
+
+setAuthErrorHandler(() => useAuthStore.getState().handleAuthError())
