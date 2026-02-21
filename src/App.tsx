@@ -1,9 +1,11 @@
+import { useState, useEffect, useCallback } from 'react'
 import { AuthGate } from '@/components/auth/AuthGate'
 import { RepoSelector } from '@/components/layout/RepoSelector'
 import { FileTree } from '@/components/filetree/FileTree'
 import { EditorPanel } from '@/components/editor/EditorPanel'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { ToastContainer } from '@/components/ui/ToastContainer'
+import { SearchModal } from '@/components/ui/SearchModal'
 import { useAuthStore } from '@/store/authStore'
 import { useRepoStore } from '@/store/repoStore'
 import { useEditorStore } from '@/store/editorStore'
@@ -13,10 +15,23 @@ function Dashboard() {
   const { owner, repo, branch } = useRepoStore()
   const { openFile, openPath } = useEditorStore()
   const isRepoConfigured = owner && repo
+  const [showSearch, setShowSearch] = useState(false)
 
-  const handleFileSelect = (path: string) => {
-    openPath(owner, repo, path)
-  }
+  const handleFileSelect = useCallback(
+    (path: string) => { openPath(owner, repo, path) },
+    [openPath, owner, repo],
+  )
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault()
+        setShowSearch((prev) => !prev)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
 
   if (!isRepoConfigured) {
     return (
@@ -62,6 +77,13 @@ function Dashboard() {
 
         <EditorPanel />
       </div>
+
+      {showSearch && (
+        <SearchModal
+          onSelect={handleFileSelect}
+          onClose={() => setShowSearch(false)}
+        />
+      )}
     </div>
   )
 }
