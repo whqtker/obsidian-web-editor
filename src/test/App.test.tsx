@@ -3,12 +3,18 @@ import { MemoryRouter } from 'react-router-dom'
 import App from '../App'
 
 describe('App', () => {
-  it('renders bootstrap message', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('shows PatForm when not authenticated', () => {
     render(
       <MemoryRouter>
         <App />
       </MemoryRouter>
     )
-    expect(screen.getByText(/Phase 0 bootstrap complete/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Personal Access Token/i)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(/ghp_/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '연결' })).toBeInTheDocument()
   })
 })
