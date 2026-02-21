@@ -1,81 +1,99 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import { validateToken, createOctokitClient, clearOctokitClient } from '@/api/github'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import {
+  fetchAuthenticatedUser,
+  buildOAuthUrl,
+  exchangeCodeForToken,
+  createOctokitClient,
+  clearOctokitClient,
+  setAuthErrorHandler,
+} from '@/api/github'
 
 interface AuthState {
-  pat: string | null
+  token: string | null
   username: string | null
   avatarUrl: string | null
   isAuthenticated: boolean
-  isValidating: boolean
+  isExchanging: boolean
   error: string | null
 }
 
 interface AuthActions {
-  login: (pat: string) => Promise<void>
+  initiateOAuth: () => void
+  handleOAuthCallback: (code: string, state: string) => Promise<void>
   logout: () => void
   rehydrate: () => void
+  handleAuthError: () => void
 }
 
 export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
     (set, get) => ({
-      pat: null,
+      token: null,
       username: null,
       avatarUrl: null,
       isAuthenticated: false,
-      isValidating: false,
+      isExchanging: false,
       error: null,
 
-      login: async (pat: string) => {
-        set({ isValidating: true, error: null })
+      initiateOAuth: () => {
+        const state = crypto.randomUUID()
+        sessionStorage.setItem('oauth_state', state)
+        window.location.href = buildOAuthUrl(state)
+      },
+
+      handleOAuthCallback: async (code: string, state: string) => {
+        const savedState = sessionStorage.getItem('oauth_state')
+        sessionStorage.removeItem('oauth_state')
+
+        if (!savedState || savedState !== state) {
+          set({ error: '인증 상태가 유효하지 않습니다. 다시 시도해주세요.', isExchanging: false })
+          return
+        }
+
+        set({ isExchanging: true, error: null })
+
         try {
-          const { login, avatarUrl } = await validateToken(pat)
-          createOctokitClient(pat)
-          set({
-            pat,
-            username: login,
-            avatarUrl,
-            isAuthenticated: true,
-            isValidating: false,
-            error: null,
-          })
+          const token = await exchangeCodeForToken(code)
+          const { login, avatarUrl } = await fetchAuthenticatedUser(token)
+          createOctokitClient(token)
+          set({ token, username: login, avatarUrl, isAuthenticated: true, isExchanging: false })
         } catch (err) {
           set({
-            pat: null,
-            username: null,
-            avatarUrl: null,
-            isAuthenticated: false,
-            isValidating: false,
-            error: err instanceof Error ? err.message : 'PAT 검증에 실패했습니다.',
+            isExchanging: false,
+            error: err instanceof Error ? err.message : '로그인에 실패했습니다.',
           })
-          throw err
         }
       },
 
       logout: () => {
         clearOctokitClient()
-        set({
-          pat: null,
-          username: null,
-          avatarUrl: null,
-          isAuthenticated: false,
-          isValidating: false,
-          error: null,
-        })
+        set({ token: null, username: null, avatarUrl: null, isAuthenticated: false, error: null })
       },
 
       rehydrate: () => {
-        const { pat } = get()
-        if (pat) {
-          createOctokitClient(pat)
+        const { token } = get()
+        if (token) {
+          createOctokitClient(token)
         }
+      },
+
+      handleAuthError: () => {
+        clearOctokitClient()
+        set({
+          token: null,
+          username: null,
+          avatarUrl: null,
+          isAuthenticated: false,
+          error: '세션이 만료되었습니다. 다시 로그인해주세요.',
+        })
       },
     }),
     {
       name: 'obsidian-auth',
+      storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
-        pat: state.pat,
+        token: state.token,
         username: state.username,
         avatarUrl: state.avatarUrl,
         isAuthenticated: state.isAuthenticated,
@@ -83,3 +101,5 @@ export const useAuthStore = create<AuthState & AuthActions>()(
     },
   ),
 )
+
+setAuthErrorHandler(() => useAuthStore.getState().handleAuthError())

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getOctokitClient } from '@/api/github'
+import type { UserRepo } from '@/types/github'
 
 interface RepoState {
   owner: string
@@ -9,12 +10,16 @@ interface RepoState {
   branches: string[]
   isValidating: boolean
   error: string | null
+  userRepos: UserRepo[]
+  isLoadingRepos: boolean
+  reposError: string | null
 }
 
 interface RepoActions {
   setRepo: (owner: string, repo: string) => Promise<void>
   setBranch: (branch: string) => void
   clearRepo: () => void
+  fetchUserRepos: () => Promise<void>
 }
 
 export const useRepoStore = create<RepoState & RepoActions>()(
@@ -26,6 +31,9 @@ export const useRepoStore = create<RepoState & RepoActions>()(
       branches: [],
       isValidating: false,
       error: null,
+      userRepos: [],
+      isLoadingRepos: false,
+      reposError: null,
 
       setRepo: async (owner: string, repo: string) => {
         set({ isValidating: true, error: null })
@@ -74,6 +82,40 @@ export const useRepoStore = create<RepoState & RepoActions>()(
           isValidating: false,
           error: null,
         })
+      },
+
+      fetchUserRepos: async () => {
+        const octokit = getOctokitClient()
+        if (!octokit) return
+
+        set({ isLoadingRepos: true, reposError: null })
+        try {
+          const repos = await octokit.paginate(
+            octokit.rest.repos.listForAuthenticatedUser,
+            { sort: 'updated', per_page: 100, affiliation: 'owner,collaborator' },
+            (response, done) => {
+              if (response.data.length < 100) done()
+              return response.data
+            },
+          )
+
+          set({
+            userRepos: repos.slice(0, 500).map((r) => ({
+              owner: r.owner.login,
+              name: r.name,
+              fullName: r.full_name,
+              private: r.private,
+              updatedAt: r.updated_at ?? '',
+              description: r.description ?? null,
+            })),
+            isLoadingRepos: false,
+          })
+        } catch (err) {
+          set({
+            isLoadingRepos: false,
+            reposError: err instanceof Error ? err.message : '레포 목록을 불러올 수 없습니다.',
+          })
+        }
       },
     }),
     {
