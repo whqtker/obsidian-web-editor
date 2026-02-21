@@ -3,6 +3,7 @@ import { deleteFile } from '@/api/contents'
 import { useRepoStore } from '@/store/repoStore'
 import { useTreeStore } from '@/store/treeStore'
 import { useEditorStore } from '@/store/editorStore'
+import { useToastStore } from '@/store/toastStore'
 import { basename } from '@/utils/pathUtils'
 
 interface ConfirmDeleteDialogProps {
@@ -17,6 +18,7 @@ export function ConfirmDeleteDialog({ path, sha, onClose }: ConfirmDeleteDialogP
   const { owner, repo, branch } = useRepoStore()
   const { fetchTree } = useTreeStore()
   const { openFile, closeFile } = useEditorStore()
+  const addToast = useToastStore((s) => s.addToast)
 
   const handleDelete = async () => {
     setIsDeleting(true)
@@ -34,6 +36,7 @@ export function ConfirmDeleteDialog({ path, sha, onClose }: ConfirmDeleteDialogP
         closeFile()
       }
       await fetchTree(owner, repo, branch)
+      addToast('success', `${basename(path)} 파일이 삭제되었습니다.`)
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : '삭제에 실패했습니다.')

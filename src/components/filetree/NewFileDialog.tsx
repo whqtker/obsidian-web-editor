@@ -3,6 +3,7 @@ import { createFile } from '@/api/contents'
 import { useRepoStore } from '@/store/repoStore'
 import { useTreeStore } from '@/store/treeStore'
 import { useEditorStore } from '@/store/editorStore'
+import { useToastStore } from '@/store/toastStore'
 import { joinPath, basename } from '@/utils/pathUtils'
 
 interface NewFileDialogProps {
@@ -17,6 +18,7 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
   const { owner, repo, branch } = useRepoStore()
   const { fetchTree } = useTreeStore()
   const { openPath } = useEditorStore()
+  const addToast = useToastStore((s) => s.addToast)
 
   const normalizedName = filename.trim()
   const finalName = normalizedName && !normalizedName.endsWith('.md')
@@ -52,6 +54,7 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
       })
       await fetchTree(owner, repo, branch)
       openPath(owner, repo, fullPath)
+      addToast('success', `${basename(fullPath)} 파일이 생성되었습니다.`)
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : '파일 생성에 실패했습니다.')

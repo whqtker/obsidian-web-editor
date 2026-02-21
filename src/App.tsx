@@ -2,6 +2,8 @@ import { AuthGate } from '@/components/auth/AuthGate'
 import { RepoSelector } from '@/components/layout/RepoSelector'
 import { FileTree } from '@/components/filetree/FileTree'
 import { EditorPanel } from '@/components/editor/EditorPanel'
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
+import { ToastContainer } from '@/components/ui/ToastContainer'
 import { useAuthStore } from '@/store/authStore'
 import { useRepoStore } from '@/store/repoStore'
 import { useEditorStore } from '@/store/editorStore'
@@ -66,9 +68,12 @@ function Dashboard() {
 
 function App() {
   return (
-    <AuthGate>
-      <Dashboard />
-    </AuthGate>
+    <ErrorBoundary>
+      <AuthGate>
+        <Dashboard />
+      </AuthGate>
+      <ToastContainer />
+    </ErrorBoundary>
   )
 }
 
