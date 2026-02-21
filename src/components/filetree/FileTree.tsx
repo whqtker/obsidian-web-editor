@@ -3,6 +3,7 @@ import { useTreeStore } from '@/store/treeStore'
 import { useRepoStore } from '@/store/repoStore'
 import { FileTreeNode } from './FileTreeNode'
 import { NewFileDialog } from './NewFileDialog'
+import { Spinner } from '@/components/ui/Spinner'
 
 interface FileTreeProps {
   selectedPath: string | null
@@ -21,7 +22,7 @@ export function FileTree({ selectedPath, onSelect }: FileTreeProps) {
   }, [owner, repo, branch, fetchTree])
 
   if (isLoading) {
-    return <p className="px-3 py-2 text-sm text-gray-500">파일 트리 로딩 중...</p>
+    return <div className="px-3 py-2"><Spinner size="sm" label="파일 트리 로딩 중..." /></div>
   }
 
   if (error) {

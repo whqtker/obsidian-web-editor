@@ -1,21 +1,25 @@
 import { useEffect, useCallback } from 'react'
 import { useEditorStore } from '@/store/editorStore'
 import { useRepoStore } from '@/store/repoStore'
+import { useToastStore } from '@/store/toastStore'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
 import { MarkdownPreview } from './MarkdownPreview'
 import { EditorToolbar } from './EditorToolbar'
+import { Spinner } from '@/components/ui/Spinner'
 
 export function EditorPanel() {
   const { openFile, isLoading, error, showPreview, updateContent, save } = useEditorStore()
   const { owner, repo, branch } = useRepoStore()
+  const addToast = useToastStore((s) => s.addToast)
 
   const handleSave = useCallback(async () => {
     try {
       await save(owner, repo, undefined, branch)
-    } catch {
-      // error shown via store
+      addToast('success', '저장되었습니다.')
+    } catch (err) {
+      addToast('error', err instanceof Error ? err.message : '저장에 실패했습니다.')
     }
-  }, [save, owner, repo, branch])
+  }, [save, owner, repo, branch, addToast])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -31,7 +35,7 @@ export function EditorPanel() {
   if (isLoading) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <p className="text-sm text-gray-500">파일 로딩 중...</p>
+        <Spinner label="파일 로딩 중..." />
       </div>
     )
   }
