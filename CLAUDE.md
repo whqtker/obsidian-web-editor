@@ -59,6 +59,25 @@ scripts/       — 로컬 개발 도구 (dev-auth-server.mjs)
 - 사용자 메시지: 한국어
 - Store: error 상태를 err instanceof Error로 안전하게 추출
 
+## UI Design Standards
+
+### 디자인 시스템
+- 다크 테마 전용: bg-gray-950(배경) → bg-gray-900(셸) → bg-gray-800(카드/패널) → bg-gray-700(입력)
+- 강조색: blue-600(CTA), yellow-500(dirty), red-600(삭제), green-800(성공)
+- 텍스트 계층: text-white(제목) → text-gray-300(본문) → text-gray-400(라벨) → text-gray-500(힌트)
+- 간격: px-3 py-1.5(소), px-4 py-2(중), p-4(카드), gap-2~3
+
+### 인터랙션 패턴
+- 모든 클릭 가능 요소에 transition-colors 필수
+- hover 상태 명확히 표시 (bg 변경 또는 text 밝기 증가)
+- 모달: fixed inset-0 bg-black/50 + 중앙 카드
+- 그룹 호버 패턴: group + hidden group-hover:block
+
+### 접근성
+- 포커스 링: focus:outline-none focus:ring-1 focus:ring-blue-500
+- 키보드 내비게이션 지원 (모달: Escape 닫기, 목록: Arrow 이동)
+- 버튼 disabled 상태: bg-gray-700 text-gray-500
+
 ## Conventions
 - 경로 별칭: `@/` → `src/`
 - npm install 시 반드시 `--legacy-peer-deps` 사용 (`.npmrc`에 설정됨)
