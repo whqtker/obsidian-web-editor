@@ -5,6 +5,7 @@ import { useToastStore } from '@/store/toastStore'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
 import { MarkdownPreview } from './MarkdownPreview'
 import { EditorToolbar } from './EditorToolbar'
+import { ImageViewer } from './ImageViewer'
 import { Spinner } from '@/components/ui/Spinner'
 import { useImageUpload } from '@/hooks/useImageUpload'
 
@@ -61,6 +62,10 @@ export function EditorPanel() {
         <p className="text-sm text-gray-600">파일을 선택하세요</p>
       </div>
     )
+  }
+
+  if (openFile.imageUrl) {
+    return <ImageViewer path={openFile.path} imageUrl={openFile.imageUrl} />
   }
 
   return (
