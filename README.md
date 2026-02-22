@@ -1,50 +1,39 @@
-# React + TypeScript + Vite
+# Obsidian Web Editor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- GitHub에 저장된 Obsidian vault를 브라우저에서 편집할 수 있는 웹 에디터
 
-Currently, two official plugins are available:
+- GitHub API를 직접 호출하여 마크다운 편집, 실시간 프리뷰, 위키링크, 이미지 업로드 등을 지원한다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[![Deploy](https://img.shields.io/badge/demo-obsidian--for--web.vercel.app-black?logo=vercel)](https://obsidian-for-web.vercel.app)
 
-## Expanding the ESLint configuration
+![React](https://img.shields.io/badge/React_18-61DAFB?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite_5-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v4-06B6D4?logo=tailwindcss&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-433E38?logo=react&logoColor=white)
+![CodeMirror](https://img.shields.io/badge/CodeMirror_6-D30707?logo=codemirror&logoColor=white)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## 시작하기
 
-- Configure the top-level `parserOptions` property like this:
+1. [obsidian-for-web.vercel.app](https://obsidian-for-web.vercel.app)에 접속
+2. GitHub 계정으로 로그인
+3. Obsidian vault가 저장된 레포지토리와 브랜치를 선택
+4. 파일 트리에서 파일을 열어 편집 시작
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 개발
+
+```bash
+npm install --legacy-peer-deps
+npm run build
+npm run test:run
+npm run lint
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- 환경 변수는 `.env.example`을 참고하여 Vercel Dashboard에서 설정한다.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## 배포
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- Vercel에서 자동 배포
+
+- `develop` 브랜치 → Preview 환경
+- `main` 브랜치 → Production 환경

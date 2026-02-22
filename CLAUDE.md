@@ -6,10 +6,19 @@ GitHub-hosted Obsidian vault의 웹 CRUD 에디터 (React + Vite SPA).
 React 18, TypeScript (strict), Vite 5, Tailwind CSS v4, Zustand, Octokit.js, CodeMirror 6, react-markdown, React Router v6
 
 ## Commands
-- `npm run dev` — 개발 서버 (OAuth 로컬 테스트 시 `node scripts/dev-auth-server.mjs` 별도 실행)
 - `npm run build` — `tsc -b && vite build`
 - `npm run test:run` — Vitest 단회 실행
 - `npm run lint` — ESLint
+
+## Environments
+- **Dev**: Vercel Preview 배포 (`https://obsidian-web-editor-git-develop-whqtkers-projects.vercel.app`)
+- **Prod**: Vercel Production 배포 (`https://obsidian-for-web.vercel.app`)
+- 환경 변수는 Vercel Dashboard에서 환경별 관리 (`.env.example` 참고)
+
+## Git Workflow
+- `feature/*` → PR → `develop` 머지 → PR → `main` 머지
+- `develop` 브랜치: Preview 환경 (Dev OAuth App 사용)
+- `main` 브랜치: Production 환경 (Prod OAuth App 사용)
 
 ## Architecture
 - 백엔드 없음. 모든 API 호출은 브라우저에서 직접 수행
