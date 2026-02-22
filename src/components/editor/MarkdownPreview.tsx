@@ -41,7 +41,7 @@ export function MarkdownPreview({ content, onNavigate }: MarkdownPreviewProps) {
 
   return (
     <div
-      className="h-full overflow-y-auto p-6 prose prose-invert prose-sm max-w-none"
+      className="h-full overflow-y-auto p-6 markdown-body"
       onClick={handleClick}
     >
       <ReactMarkdown
