@@ -6,6 +6,7 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeSlug from 'rehype-slug'
 import rehypeRaw from 'rehype-raw'
 import { useTreeStore } from '@/store/treeStore'
+import { useRepoStore } from '@/store/repoStore'
 import { replaceWikiLinks } from '@/utils/wikilink'
 import { replaceTagsForPreview } from '@/utils/tags'
 
@@ -17,10 +18,12 @@ interface MarkdownPreviewProps {
 export function MarkdownPreview({ content, onNavigate }: MarkdownPreviewProps) {
   const flatNodes = useTreeStore((s) => s.flatNodes)
   const allPaths = useMemo(() => flatNodes.map((n) => n.path), [flatNodes])
+  const { owner, repo, branch } = useRepoStore()
+  const rawBaseUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}`
 
   const processed = useMemo(
-    () => replaceTagsForPreview(replaceWikiLinks(content, allPaths)),
-    [content, allPaths],
+    () => replaceTagsForPreview(replaceWikiLinks(content, allPaths, rawBaseUrl)),
+    [content, allPaths, rawBaseUrl],
   )
 
   const handleClick = useCallback(
