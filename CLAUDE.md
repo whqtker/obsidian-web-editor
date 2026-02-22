@@ -11,7 +11,7 @@ React 18, TypeScript (strict), Vite 5, Tailwind CSS v4, Zustand, Octokit.js, Cod
 - `npm run lint` — ESLint
 
 ## Environments
-- **Dev**: Vercel Preview 배포 (`https://obsidian-for-web-git-develop-whqtkers-projects.vercel.app`)
+- **Dev**: Vercel Preview 배포 (`https://obsidian-web-editor-git-develop-whqtkers-projects.vercel.app`)
 - **Prod**: Vercel Production 배포 (`https://obsidian-for-web.vercel.app`)
 - 환경 변수는 Vercel Dashboard에서 환경별 관리 (`.env.example` 참고)
 
