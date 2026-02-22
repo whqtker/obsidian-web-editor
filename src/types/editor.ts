@@ -4,4 +4,5 @@ export interface OpenFile {
   content: string;
   isDirty: boolean;
   lastFetchedAt: number;
+  imageUrl?: string;
 }

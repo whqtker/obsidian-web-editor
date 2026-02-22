@@ -29,6 +29,26 @@ export async function fetchFile(
   }
 }
 
+export async function fetchImageUrl(
+  owner: string,
+  repo: string,
+  path: string,
+): Promise<{ downloadUrl: string; sha: string }> {
+  const octokit = getOctokitClient()
+  if (!octokit) throw new Error('인증이 필요합니다.')
+
+  try {
+    const { data } = await octokit.rest.repos.getContent({ owner, repo, path })
+    const file = data as GitHubFile
+    if (file.type !== 'file' || !file.download_url) {
+      throw new Error(`${path}은(는) 이미지 파일이 아닙니다.`)
+    }
+    return { downloadUrl: file.download_url, sha: file.sha }
+  } catch (err) {
+    rethrowWithAuthCheck(err)
+  }
+}
+
 export async function saveFile(params: {
   owner: string
   repo: string

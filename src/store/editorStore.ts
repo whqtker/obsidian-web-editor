@@ -1,7 +1,7 @@
 import { create } from 'zustand'
-import { fetchFile, saveFile } from '@/api/contents'
+import { fetchFile, fetchImageUrl, saveFile } from '@/api/contents'
 import { rethrowWithAuthCheck } from '@/api/github'
-import { basename } from '@/utils/pathUtils'
+import { basename, isImage } from '@/utils/pathUtils'
 import type { OpenFile } from '@/types/editor'
 
 interface EditorState {
@@ -30,17 +30,19 @@ export const useEditorStore = create<EditorState & EditorActions>()((set, get) =
   openPath: async (owner, repo, path) => {
     set({ isLoading: true, error: null })
     try {
-      const { content, sha } = await fetchFile(owner, repo, path)
-      set({
-        openFile: {
-          path,
-          sha,
-          content,
-          isDirty: false,
-          lastFetchedAt: Date.now(),
-        },
-        isLoading: false,
-      })
+      if (isImage(path)) {
+        const { downloadUrl, sha } = await fetchImageUrl(owner, repo, path)
+        set({
+          openFile: { path, sha, content: '', isDirty: false, lastFetchedAt: Date.now(), imageUrl: downloadUrl },
+          isLoading: false,
+        })
+      } else {
+        const { content, sha } = await fetchFile(owner, repo, path)
+        set({
+          openFile: { path, sha, content, isDirty: false, lastFetchedAt: Date.now() },
+          isLoading: false,
+        })
+      }
     } catch (err) {
       set({
         isLoading: false,

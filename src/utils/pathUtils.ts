@@ -89,3 +89,9 @@ export function isMarkdown(path: string): boolean {
   const ext = extname(path).toLowerCase()
   return ext === '.md' || ext === '.markdown'
 }
+
+const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.bmp', '.ico']
+
+export function isImage(path: string): boolean {
+  return IMAGE_EXTENSIONS.includes(extname(path).toLowerCase())
+}
