@@ -1,12 +1,13 @@
-import { basename } from '@/utils/pathUtils'
+import { basename, isImage } from '@/utils/pathUtils'
 
 const WIKILINK_RE = /\[\[([^\]]+)\]\]/g
 
 /**
  * Replace [[wikilinks]] with markdown links for react-markdown to render.
+ * Image wikilinks are converted to real GitHub raw URLs when rawBaseUrl is provided.
  * Unresolved links get a strikethrough style.
  */
-export function replaceWikiLinks(content: string, allPaths: string[]): string {
+export function replaceWikiLinks(content: string, allPaths: string[], rawBaseUrl?: string): string {
   return content.replace(WIKILINK_RE, (_match, inner: string) => {
     let target = inner
     let display: string | undefined
@@ -28,6 +29,9 @@ export function replaceWikiLinks(content: string, allPaths: string[]): string {
     const label = display || target || heading.slice(1)
 
     if (resolved) {
+      if (rawBaseUrl && isImage(resolved)) {
+        return `![${label}](${rawBaseUrl}/${encodeURI(resolved)})`
+      }
       return `[${label}](wikilink:${resolved}${heading})`
     }
     return `~~${label}~~`
@@ -44,7 +48,9 @@ export function resolveWikiLink(
 ): string | null {
   if (!target) return null
 
-  const normalized = target.endsWith('.md') ? target : `${target}.md`
+  // Image files and files with explicit extensions are not .md — don't append suffix
+  const hasExtension = /\.[^./]+$/.test(target)
+  const normalized = hasExtension ? target : `${target}.md`
 
   // Exact path match
   const exact = allPaths.find((p) => p === normalized)
