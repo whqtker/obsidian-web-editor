@@ -5,14 +5,6 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vite.dev/config/
 export default defineConfig({
-  server: {
-    proxy: {
-      '/api/auth/callback': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-      },
-    },
-  },
   plugins: [
     tailwindcss(),
     react(),
