@@ -13,17 +13,8 @@ export function OAuthLoginScreen() {
         {/* 카드 */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-2xl px-12 py-14 text-center backdrop-blur-sm">
           {/* 옵시디언 로고 */}
-          <div className="inline-flex items-center justify-center w-18 h-18 rounded-2xl bg-gray-800 border border-gray-700 mb-10 p-3.5">
-            <svg width="36" height="36" viewBox="0 0 512 512" fill="none">
-              <path d="M377.5 291.1c-5.7-2.3-12.2-.8-16.2 3.8l-30.1 34.7c-3.5 4-9.1 5.7-14.3 4.3l-57.4-15.3c-4.6-1.2-9.5.3-12.8 3.9l-42.4 46.5c-2.1 2.3-5 3.7-8.1 3.9l-76.3 4.6c-5.2.3-10-2.5-12.3-7.2L68.8 289c-1.7-3.5-1.5-7.6.6-10.9l50.2-79.5c2.3-3.7 2.5-8.3.5-12.1L91.4 130c-2.4-4.6-1.7-10.2 1.8-14l69.5-75c3.1-3.3 7.6-4.8 12-4l82.8 15.5c4.6.9 9.3-.7 12.5-4.1l47.3-50.3c3.8-4 9.5-5.3 14.6-3.3l70.1 27.5c4.3 1.7 7.4 5.5 8.2 10l20.8 120.7c.7 3.8-.3 7.8-2.7 10.8l-32.8 41c-2.7 3.4-3.5 7.9-2.1 12l21.2 62.5c1.7 5 .3 10.5-3.5 13.9l-36.9 32.7c-3.2 2.9-7.8 3.8-11.9 2.3z" fill="#7C3AED" />
-              <path d="M377.5 291.1c-5.7-2.3-12.2-.8-16.2 3.8l-30.1 34.7c-3.5 4-9.1 5.7-14.3 4.3l-57.4-15.3c-4.6-1.2-9.5.3-12.8 3.9l-42.4 46.5c-2.1 2.3-5 3.7-8.1 3.9l-76.3 4.6c-5.2.3-10-2.5-12.3-7.2L68.8 289c-1.7-3.5-1.5-7.6.6-10.9l50.2-79.5c2.3-3.7 2.5-8.3.5-12.1L91.4 130c-2.4-4.6-1.7-10.2 1.8-14l69.5-75c3.1-3.3 7.6-4.8 12-4l82.8 15.5c4.6.9 9.3-.7 12.5-4.1l47.3-50.3c3.8-4 9.5-5.3 14.6-3.3l70.1 27.5c4.3 1.7 7.4 5.5 8.2 10l20.8 120.7c.7 3.8-.3 7.8-2.7 10.8l-32.8 41c-2.7 3.4-3.5 7.9-2.1 12l21.2 62.5c1.7 5 .3 10.5-3.5 13.9l-36.9 32.7c-3.2 2.9-7.8 3.8-11.9 2.3z" fill="url(#obsidian-shine)" fillOpacity="0.3" />
-              <defs>
-                <linearGradient id="obsidian-shine" x1="68" y1="0" x2="440" y2="400" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#A78BFA" />
-                  <stop offset="1" stopColor="#7C3AED" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-            </svg>
+          <div className="mb-10">
+            <img src="/obsidian-icon.svg" alt="Obsidian" width="64" height="64" className="mx-auto" />
           </div>
 
           <h1 className="text-2xl font-bold text-white tracking-tight mb-4">
