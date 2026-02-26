@@ -13,7 +13,7 @@ export function OAuthLoginScreen() {
         {/* 카드 */}
         <div className="bg-gray-900/80 border border-gray-800 rounded-2xl px-10 py-12 text-center backdrop-blur-sm">
           {/* 로고 */}
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gray-800 border border-gray-700 mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gray-800 border border-gray-700 mb-8">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
               <rect x="6" y="6" width="8" height="8" rx="1.5" fill="#818cf8" />
               <rect x="18" y="6" width="8" height="8" rx="1.5" fill="#818cf8" opacity="0.5" />
@@ -22,10 +22,10 @@ export function OAuthLoginScreen() {
             </svg>
           </div>
 
-          <h1 className="text-2xl font-bold text-white tracking-tight mb-2">
+          <h1 className="text-2xl font-bold text-white tracking-tight mb-3">
             Obsidian Web Editor
           </h1>
-          <p className="text-gray-400 text-sm mb-8 leading-relaxed">
+          <p className="text-gray-400 text-sm mb-10 leading-relaxed">
             GitHub 계정으로 로그인하여 vault에 연결합니다.
           </p>
 
@@ -47,7 +47,7 @@ export function OAuthLoginScreen() {
           </button>
 
           {/* 구분선 */}
-          <div className="flex items-center gap-3 my-6">
+          <div className="flex items-center gap-3 my-8">
             <div className="flex-1 h-px bg-gray-800" />
             <span className="text-xs text-gray-600">기능</span>
             <div className="flex-1 h-px bg-gray-800" />
@@ -55,21 +55,21 @@ export function OAuthLoginScreen() {
 
           {/* 기능 하이라이트 */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-gray-800/50 rounded-xl p-3 flex flex-col items-center gap-1.5">
+            <div className="bg-gray-800/50 rounded-xl p-4 flex flex-col items-center gap-2">
               <span className="text-lg">✎</span>
               <span className="text-xs text-gray-400">마크다운 편집</span>
             </div>
-            <div className="bg-gray-800/50 rounded-xl p-3 flex flex-col items-center gap-1.5">
+            <div className="bg-gray-800/50 rounded-xl p-4 flex flex-col items-center gap-2">
               <span className="text-lg">⟳</span>
               <span className="text-xs text-gray-400">GitHub 동기화</span>
             </div>
-            <div className="bg-gray-800/50 rounded-xl p-3 flex flex-col items-center gap-1.5">
+            <div className="bg-gray-800/50 rounded-xl p-4 flex flex-col items-center gap-2">
               <span className="text-lg">◉</span>
               <span className="text-xs text-gray-400">실시간 미리보기</span>
             </div>
           </div>
 
-          <p className="mt-6 text-xs text-gray-600">
+          <p className="mt-8 text-xs text-gray-600">
             필요 권한: <code className="text-gray-500 font-mono">repo</code>
           </p>
         </div>
