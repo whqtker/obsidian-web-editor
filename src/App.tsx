@@ -35,7 +35,7 @@ function Dashboard() {
 
   if (!isRepoConfigured) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-900 text-white">
+      <div className="h-screen flex items-center justify-center bg-gray-950 text-white">
         <div className="w-full max-w-sm">
           <RepoSelector />
         </div>
@@ -44,18 +44,19 @@ function Dashboard() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-900 text-white">
-      <header className="flex items-center justify-between px-4 py-2 border-b border-gray-800 shrink-0">
-        <span className="text-sm font-semibold">Obsidian Web Editor</span>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500 font-mono">
+    <div className="h-screen flex flex-col bg-gray-950 text-white">
+      <header className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800/80 shrink-0 bg-gray-950/95 backdrop-blur-sm">
+        <span className="text-sm font-semibold tracking-tight">Obsidian Web Editor</span>
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-gray-400 font-mono">
             {owner}/{repo}
-            <span className="text-gray-700 ml-1">({branch})</span>
+            <span className="text-gray-600 ml-1.5">({branch})</span>
           </span>
+          <div className="w-px h-3 bg-gray-700" />
           <span className="text-xs text-gray-400">{username}</span>
           <button
             onClick={logout}
-            className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            className="text-xs text-gray-500 hover:text-gray-300 transition-colors rounded px-1.5 py-0.5 hover:bg-gray-800"
           >
             로그아웃
           </button>
@@ -63,11 +64,11 @@ function Dashboard() {
       </header>
 
       <div className="flex-1 flex min-h-0">
-        <aside className="w-64 border-r border-gray-800 flex flex-col shrink-0">
-          <div className="px-3 py-2 border-b border-gray-800">
+        <aside className="w-64 border-r border-gray-800/80 flex flex-col shrink-0 bg-gray-950">
+          <div className="px-3 py-2.5 border-b border-gray-800/80">
             <RepoSelector />
           </div>
-          <div className="flex-1 overflow-y-auto py-1">
+          <div className="flex-1 overflow-y-auto py-1.5">
             <FileTree
               selectedPath={openFile?.path ?? null}
               onSelect={handleFileSelect}

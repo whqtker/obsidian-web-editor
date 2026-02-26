@@ -34,8 +34,10 @@ export function FileTreeNode({ node, depth, selectedPath, onSelect, onNewFile }:
   return (
     <div>
       <div
-        className={`group flex items-center hover:bg-gray-800 rounded transition-colors ${
-          isSelected ? 'bg-gray-800 text-white' : 'text-gray-300'
+        className={`group flex items-center rounded transition-colors ${
+          isSelected
+            ? 'bg-gray-800 text-white border-l-2 border-blue-500'
+            : 'text-gray-400 hover:bg-gray-800/60 hover:text-gray-200 border-l-2 border-transparent'
         }`}
       >
         <button
@@ -44,7 +46,7 @@ export function FileTreeNode({ node, depth, selectedPath, onSelect, onNewFile }:
           className="flex-1 text-left px-3 py-1.5 text-sm flex items-center gap-1.5 min-w-0 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500"
           style={{ paddingLeft: `${depth * 12 + 8}px` }}
         >
-          <span className="shrink-0 w-4 text-center text-xs text-gray-500">
+          <span className="shrink-0 w-4 text-center text-xs text-gray-600">
             {isDir ? (expanded ? '▾' : '▸') : ''}
           </span>
           <span className="truncate">{node.name}</span>

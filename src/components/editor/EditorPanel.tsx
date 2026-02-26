@@ -58,8 +58,12 @@ export function EditorPanel() {
 
   if (!openFile) {
     return (
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center">
+        <div className="w-10 h-10 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center text-gray-600 text-lg">
+          ✎
+        </div>
         <p className="text-sm text-gray-600">파일을 선택하세요</p>
+        <p className="text-xs text-gray-700">Ctrl+P 로 파일 검색</p>
       </div>
     )
   }
