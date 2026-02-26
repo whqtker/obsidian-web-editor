@@ -11,21 +11,19 @@ export function OAuthLoginScreen() {
 
       <div className="relative w-full max-w-lg">
         {/* 카드 */}
-        <div className="bg-gray-900/80 border border-gray-800 rounded-2xl px-12 py-14 text-center backdrop-blur-sm">
+        <div className="bg-gray-900/80 border border-gray-800 rounded-2xl px-12 py-16 backdrop-blur-sm flex flex-col items-center">
           {/* 옵시디언 로고 */}
-          <div className="mb-10">
-            <img src="/obsidian-icon.svg" alt="Obsidian" width="64" height="64" className="mx-auto" />
-          </div>
+          <img src="/obsidian-icon.svg" alt="Obsidian" width="64" height="64" className="mb-20" />
 
-          <h1 className="text-2xl font-bold text-white tracking-tight mb-4">
+          <h1 className="text-2xl font-bold text-white tracking-tight mb-8">
             Obsidian Web Editor
           </h1>
-          <p className="text-gray-400 text-sm mb-12 leading-relaxed">
+          <p className="text-gray-400 text-sm mb-20 leading-relaxed">
             GitHub 계정으로 로그인하여 vault에 연결합니다.
           </p>
 
           {error && (
-            <p className="text-red-400 text-sm mb-6 bg-red-400/10 rounded-lg px-4 py-2">
+            <p className="text-red-400 text-sm mb-12 bg-red-400/10 rounded-lg px-4 py-2">
               {error}
             </p>
           )}
@@ -42,14 +40,14 @@ export function OAuthLoginScreen() {
           </button>
 
           {/* 구분선 */}
-          <div className="flex items-center gap-3 my-10">
+          <div className="flex items-center gap-3 w-full my-20">
             <div className="flex-1 h-px bg-gray-800" />
             <span className="text-xs text-gray-600">기능</span>
             <div className="flex-1 h-px bg-gray-800" />
           </div>
 
           {/* 기능 하이라이트 */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 w-full">
             <div className="bg-gray-800/50 rounded-xl py-5 px-3 flex flex-col items-center justify-center gap-3">
               <span className="text-lg">✎</span>
               <span className="text-xs text-gray-400">마크다운 편집</span>
@@ -64,7 +62,7 @@ export function OAuthLoginScreen() {
             </div>
           </div>
 
-          <p className="mt-10 text-xs text-gray-600">
+          <p className="mt-20 text-xs text-gray-600">
             필요 권한: <code className="text-gray-500 font-mono">repo</code>
           </p>
         </div>
