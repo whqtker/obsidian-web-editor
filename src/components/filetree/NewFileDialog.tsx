@@ -53,9 +53,9 @@ export function NewFileDialog({ directory, onClose }: NewFileDialogProps) {
         branch,
       })
       addNode(fullPath, sha)
-      await openPath(owner, repo, fullPath)
       addToast('success', `${basename(fullPath)} 파일이 생성되었습니다.`)
       onClose()
+      openPath(owner, repo, fullPath)
     } catch (err) {
       setError(err instanceof Error ? err.message : '파일 생성에 실패했습니다.')
       setIsCreating(false)

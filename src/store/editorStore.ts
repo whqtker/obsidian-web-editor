@@ -10,6 +10,7 @@ interface EditorState {
   isSaving: boolean
   error: string | null
   showPreview: boolean
+  _requestId: number
 }
 
 interface EditorActions {
@@ -26,24 +27,29 @@ export const useEditorStore = create<EditorState & EditorActions>()((set, get) =
   isSaving: false,
   error: null,
   showPreview: false,
+  _requestId: 0,
 
   openPath: async (owner, repo, path) => {
-    set({ isLoading: true, error: null })
+    const requestId = get()._requestId + 1
+    set({ isLoading: true, error: null, _requestId: requestId })
     try {
       if (isImage(path)) {
         const { downloadUrl, sha } = await fetchImageUrl(owner, repo, path)
+        if (get()._requestId !== requestId) return
         set({
           openFile: { path, sha, content: '', isDirty: false, lastFetchedAt: Date.now(), imageUrl: downloadUrl },
           isLoading: false,
         })
       } else {
         const { content, sha } = await fetchFile(owner, repo, path)
+        if (get()._requestId !== requestId) return
         set({
           openFile: { path, sha, content, isDirty: false, lastFetchedAt: Date.now() },
           isLoading: false,
         })
       }
     } catch (err) {
+      if (get()._requestId !== requestId) return
       set({
         isLoading: false,
         error: err instanceof Error ? err.message : '파일을 열 수 없습니다.',
@@ -90,7 +96,7 @@ export const useEditorStore = create<EditorState & EditorActions>()((set, get) =
   },
 
   closeFile: () => {
-    set({ openFile: null, error: null })
+    set((state) => ({ openFile: null, error: null, isLoading: false, _requestId: state._requestId + 1 }))
   },
 
   togglePreview: () => {
