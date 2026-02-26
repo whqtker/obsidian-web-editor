@@ -25,6 +25,8 @@ dist-ssr
 
 # Claude Code
 .claude
+.serena
+.mcp.json
 
 # Test coverage
 coverage
