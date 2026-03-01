@@ -117,6 +117,7 @@ export function EditorPanel() {
             >
               <MarkdownPreview
                 content={openFile.content}
+                currentFilePath={openFile.path}
                 onNavigate={handleNavigate}
                 wrapperRef={previewRef}
               />

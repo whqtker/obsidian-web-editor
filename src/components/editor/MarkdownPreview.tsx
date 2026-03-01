@@ -12,14 +12,34 @@ import { useRepoStore } from '@/store/repoStore'
 import { replaceWikiLinks } from '@/utils/wikilink'
 import { replaceTagsForPreview } from '@/utils/tags'
 import { rehypeSafeHtml } from '@/utils/rehypeSafeHtml'
+import { dirname } from '@/utils/pathUtils'
 
 interface MarkdownPreviewProps {
   content: string
+  currentFilePath?: string
   onNavigate?: (path: string) => void
   wrapperRef?: RefObject<HTMLDivElement>
 }
 
-export function MarkdownPreview({ content, onNavigate, wrapperRef }: MarkdownPreviewProps) {
+/** 파일 디렉토리 기준으로 상대 경로를 resolve */
+function resolveRelativePath(dirPath: string, relativeSrc: string): string {
+  const parts = dirPath ? dirPath.split('/') : []
+  for (const part of relativeSrc.split('/')) {
+    if (part === '..') parts.pop()
+    else if (part !== '.') parts.push(part)
+  }
+  return parts.join('/')
+}
+
+/** 이미지 src를 GitHub raw URL로 변환 (절대 URL이면 그대로) */
+function resolveImageSrc(src: string, currentFilePath: string, rawBaseUrl: string): string {
+  if (/^https?:\/\//i.test(src) || src.startsWith('data:')) return src
+  const dir = dirname(currentFilePath)
+  const resolved = resolveRelativePath(dir, src)
+  return `${rawBaseUrl}/${encodeURI(resolved)}`
+}
+
+export function MarkdownPreview({ content, currentFilePath, onNavigate, wrapperRef }: MarkdownPreviewProps) {
   const flatNodes = useTreeStore((s) => s.flatNodes)
   const allPaths = useMemo(() => flatNodes.map((n) => n.path), [flatNodes])
   const { owner, repo, branch } = useRepoStore()
@@ -46,6 +66,17 @@ export function MarkdownPreview({ content, onNavigate, wrapperRef }: MarkdownPre
     [onNavigate],
   )
 
+  const imgComponent = useMemo(
+    () => ({
+      img: ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+        const resolvedSrc =
+          src && currentFilePath ? resolveImageSrc(src, currentFilePath, rawBaseUrl) : src
+        return <img src={resolvedSrc} alt={alt} {...props} />
+      },
+    }),
+    [currentFilePath, rawBaseUrl],
+  )
+
   return (
     <div
       ref={wrapperRef}
@@ -55,6 +86,7 @@ export function MarkdownPreview({ content, onNavigate, wrapperRef }: MarkdownPre
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkFrontmatter, remarkMath]}
         rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeSlug, rehypeKatex, rehypeSafeHtml]}
+        components={imgComponent}
       >
         {processed}
       </ReactMarkdown>
