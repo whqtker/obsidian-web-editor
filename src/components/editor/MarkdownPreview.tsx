@@ -69,8 +69,10 @@ function GhImage({
   alt,
   owner,
   repo,
+  // react-markdown이 주입하는 hast node 객체 — DOM <img>에 전달하지 않도록 제거
+  node: _,
   ...domProps
-}: React.ImgHTMLAttributes<HTMLImageElement> & { owner: string; repo: string }) {
+}: React.ImgHTMLAttributes<HTMLImageElement> & { owner: string; repo: string; node?: unknown }) {
   const [resolvedUrl, setResolvedUrl] = useState<string | undefined>(undefined)
   const [failed, setFailed] = useState(false)
 
@@ -78,6 +80,7 @@ function GhImage({
     if (!src) return
 
     if (!src.startsWith('ghimg:')) {
+      setFailed(false)
       setResolvedUrl(src)
       return
     }
@@ -87,6 +90,7 @@ function GhImage({
 
     const cached = imageUrlCache.get(cacheKey)
     if (cached) {
+      setFailed(false)
       setResolvedUrl(cached)
       return
     }
@@ -138,8 +142,8 @@ export function MarkdownPreview({ content, currentFilePath, onNavigate, wrapperR
 
   const imgComponent = useMemo(
     () => ({
-      // node prop (hast element)은 DOM에 전달하지 않도록 destructure해서 제거
-      img: ({ src, alt, node: _, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { node?: unknown }) => {
+      // node prop 필터링은 GhImage 내부에서 처리됨
+      img: ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { node?: unknown }) => {
         const resolvedSrc =
           src && currentFilePath ? resolveImageSrc(src, currentFilePath) : src
         return <GhImage src={resolvedSrc} alt={alt} owner={owner} repo={repo} {...props} />
