@@ -1,4 +1,4 @@
-import { replaceWikiLinks } from '../utils/wikilink'
+import { replaceWikiLinks } from '@/utils/wikilink'
 
 const ALL_PATHS = [
   'attachments/Pasted image 20260208223213.png',

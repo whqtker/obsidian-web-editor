@@ -14,7 +14,7 @@ GitHub-hosted Obsidian vault의 웹 CRUD 에디터 (React + Vite SPA). 백엔드
 
 ## Project Structure
 
-```
+```text
 src/api/        — GitHub API 래퍼 (Octokit) + OAuth 헬퍼
 src/store/      — Zustand stores
 src/hooks/      — 커스텀 훅
