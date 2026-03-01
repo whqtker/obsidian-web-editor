@@ -42,11 +42,12 @@ export async function fetchImageUrl(
   owner: string,
   repo: string,
   path: string,
+  branch?: string,
 ): Promise<{ downloadUrl: string; sha: string }> {
   const octokit = requireOctokit()
 
   try {
-    const { data } = await octokit.rest.repos.getContent({ owner, repo, path })
+    const { data } = await octokit.rest.repos.getContent({ owner, repo, path, ...(branch ? { ref: branch } : {}) })
     if (Array.isArray(data) || data.type !== 'file' || !data.download_url) {
       throw new Error(`${path}은(는) 이미지 파일이 아닙니다.`)
     }
