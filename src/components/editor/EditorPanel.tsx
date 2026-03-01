@@ -10,6 +10,7 @@ import { MarkdownToolbar } from './MarkdownToolbar'
 import { ImageViewer } from './ImageViewer'
 import { Spinner } from '@/components/ui/Spinner'
 import { useImageUpload } from '@/hooks/useImageUpload'
+import { useScrollSync } from '@/hooks/useScrollSync'
 
 export function EditorPanel() {
   const { openFile, isLoading, error, showPreview, updateContent, save, openPath } = useEditorStore()
@@ -17,6 +18,9 @@ export function EditorPanel() {
   const addToast = useToastStore((s) => s.addToast)
   const { uploadImage } = useImageUpload()
   const editorRef = useRef<ReactCodeMirrorRef>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
+
+  useScrollSync(editorRef, previewRef, showPreview)
 
   const handleNavigate = useCallback(
     (path: string) => { openPath(owner, repo, path) },
@@ -85,7 +89,7 @@ export function EditorPanel() {
         </div>
         {showPreview && (
           <div className="w-1/2 min-h-0 overflow-hidden">
-            <MarkdownPreview content={openFile.content} onNavigate={handleNavigate} />
+          <MarkdownPreview content={openFile.content} onNavigate={handleNavigate} wrapperRef={previewRef} />
           </div>
         )}
       </div>

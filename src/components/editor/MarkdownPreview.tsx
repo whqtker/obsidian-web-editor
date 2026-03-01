@@ -1,21 +1,25 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, type RefObject } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkFrontmatter from 'remark-frontmatter'
+import remarkMath from 'remark-math'
 import rehypeHighlight from 'rehype-highlight'
 import rehypeSlug from 'rehype-slug'
 import rehypeRaw from 'rehype-raw'
+import rehypeKatex from 'rehype-katex'
 import { useTreeStore } from '@/store/treeStore'
 import { useRepoStore } from '@/store/repoStore'
 import { replaceWikiLinks } from '@/utils/wikilink'
 import { replaceTagsForPreview } from '@/utils/tags'
+import { rehypeSafeHtml } from '@/utils/rehypeSafeHtml'
 
 interface MarkdownPreviewProps {
   content: string
   onNavigate?: (path: string) => void
+  wrapperRef?: RefObject<HTMLDivElement>
 }
 
-export function MarkdownPreview({ content, onNavigate }: MarkdownPreviewProps) {
+export function MarkdownPreview({ content, onNavigate, wrapperRef }: MarkdownPreviewProps) {
   const flatNodes = useTreeStore((s) => s.flatNodes)
   const allPaths = useMemo(() => flatNodes.map((n) => n.path), [flatNodes])
   const { owner, repo, branch } = useRepoStore()
@@ -44,12 +48,13 @@ export function MarkdownPreview({ content, onNavigate }: MarkdownPreviewProps) {
 
   return (
     <div
+      ref={wrapperRef}
       className="h-full overflow-y-auto p-6 markdown-body"
       onClick={handleClick}
     >
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkFrontmatter]}
-        rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeSlug]}
+        remarkPlugins={[remarkGfm, remarkFrontmatter, remarkMath]}
+        rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeSlug, rehypeKatex, rehypeSafeHtml]}
       >
         {processed}
       </ReactMarkdown>
