@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { useTreeStore } from '@/store/treeStore'
+import { Modal } from '@/components/ui/Modal'
 import { fuzzyMatch } from '@/utils/fuzzyMatch'
 import { basename } from '@/utils/pathUtils'
 
@@ -73,44 +74,43 @@ export function SearchModal({ onSelect, onClose }: SearchModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start justify-center pt-[20vh] z-50 animate-[fadeIn_0.15s_ease-out]" onClick={onClose}>
-      <div
-        className="bg-gray-800 rounded-lg w-full max-w-md mx-4 shadow-2xl overflow-hidden animate-[modalIn_0.2s_ease-out]"
-        onClick={(e) => e.stopPropagation()}
-        onKeyDown={handleKeyDown}
-      >
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="파일명으로 검색..."
-          className="w-full px-4 py-3 bg-gray-800 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 border-b border-gray-700"
-        />
+    <Modal
+      onClose={onClose}
+      position="top"
+      className="w-full max-w-md mx-4 shadow-2xl overflow-hidden"
+      onKeyDown={handleKeyDown}
+    >
+      <input
+        ref={inputRef}
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="파일명으로 검색..."
+        className="w-full px-4 py-3 bg-gray-800 text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 border-b border-gray-700"
+      />
 
-        <div ref={listRef} className="max-h-64 overflow-y-auto">
-          {results.length === 0 ? (
-            <p className="px-4 py-3 text-sm text-gray-500">검색 결과가 없습니다.</p>
-          ) : (
-            results.map((path, i) => (
-              <button
-                key={path}
-                onClick={() => { onSelect(path); onClose() }}
-                className={`w-full text-left px-4 py-2 text-sm flex flex-col gap-0.5 transition-colors focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500 ${
-                  i === selectedIdx
-                    ? 'bg-blue-600/30 text-white'
-                    : 'text-gray-300 hover:bg-gray-700'
-                }`}
-              >
-                <span className="truncate">{basename(path)}</span>
-                {path !== basename(path) && (
-                  <span className="text-xs text-gray-500 truncate">{path}</span>
-                )}
-              </button>
-            ))
-          )}
-        </div>
+      <div ref={listRef} className="max-h-64 overflow-y-auto">
+        {results.length === 0 ? (
+          <p className="px-4 py-3 text-sm text-gray-500">검색 결과가 없습니다.</p>
+        ) : (
+          results.map((path, i) => (
+            <button
+              key={path}
+              onClick={() => { onSelect(path); onClose() }}
+              className={`w-full text-left px-4 py-2 text-sm flex flex-col gap-0.5 transition-colors focus:outline-none focus:ring-1 focus:ring-inset focus:ring-blue-500 ${
+                i === selectedIdx
+                  ? 'bg-blue-600/30 text-white'
+                  : 'text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <span className="truncate">{basename(path)}</span>
+              {path !== basename(path) && (
+                <span className="text-xs text-gray-500 truncate">{path}</span>
+              )}
+            </button>
+          ))
+        )}
       </div>
-    </div>
+    </Modal>
   )
 }

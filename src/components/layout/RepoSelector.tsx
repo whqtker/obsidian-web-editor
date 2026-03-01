@@ -11,7 +11,7 @@ export function RepoSelector() {
   } = useRepoStore()
 
   const [search, setSearch] = useState('')
-  const isConfigured = owner && repo
+  const isConfigured = !!(owner && repo)
 
   useEffect(() => {
     if (!isConfigured && userRepos.length === 0 && !isLoadingRepos) {

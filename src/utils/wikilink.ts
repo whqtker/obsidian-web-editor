@@ -1,6 +1,7 @@
 import { basename, isImage } from '@/utils/pathUtils'
 
 const WIKILINK_RE = /\[\[([^\]]+)\]\]/g
+const HAS_EXTENSION_RE = /\.[^./]+$/
 
 /**
  * Replace [[wikilinks]] with markdown links for react-markdown to render.
@@ -42,14 +43,14 @@ export function replaceWikiLinks(content: string, allPaths: string[], rawBaseUrl
  * Resolve a wikilink target to a full file path.
  * Obsidian uses shortest-path matching: "note" matches "folder/note.md"
  */
-export function resolveWikiLink(
+function resolveWikiLink(
   target: string,
   allPaths: string[],
 ): string | null {
   if (!target) return null
 
   // Image files and files with explicit extensions are not .md — don't append suffix
-  const hasExtension = /\.[^./]+$/.test(target)
+  const hasExtension = HAS_EXTENSION_RE.test(target)
   const normalized = hasExtension ? target : `${target}.md`
 
   // Exact path match
