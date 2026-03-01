@@ -55,7 +55,7 @@ body {
   font-size: 1rem;
   line-height: 1.75;
   word-break: keep-all;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 /* Heading spacing: Velog-style larger gap above headings that follow paragraphs */
@@ -86,13 +86,13 @@ body {
   padding: 0.15em 0.4em;
   border-radius: 4px;
   font-size: 0.875em;
-  font-family: 'Fira Mono', 'Söhne Mono', 'Consolas', monospace;
+  font-family: 'Fira Mono', 'Söhne Mono', Consolas, monospace;
   border: none;
 }
 
 /* Code block font */
 .markdown-body pre {
-  font-family: 'Fira Mono', 'Söhne Mono', 'Consolas', monospace;
+  font-family: 'Fira Mono', 'Söhne Mono', Consolas, monospace;
   font-size: 0.875rem;
   border-radius: 6px;
 }
@@ -108,7 +108,7 @@ body {
 .markdown-body table td {
   padding: 0.5rem 0.75rem;
   border: 1px solid #374151;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .markdown-body table thead th {
   border-bottom: 2px solid #4b5563;
