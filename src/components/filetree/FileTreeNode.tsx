@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import type { TreeNode } from '@/types/obsidian'
 import { ConfirmDeleteDialog } from './ConfirmDeleteDialog'
 
@@ -11,25 +11,35 @@ interface FileTreeNodeProps {
 }
 
 export function FileTreeNode({ node, depth, selectedPath, onSelect, onNewFile }: FileTreeNodeProps) {
-  const [expanded, setExpanded] = useState(depth === 0)
+  const [expanded, setExpanded] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
   const isDir = node.type === 'directory'
   const isSelected = node.path === selectedPath
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (isDir) {
       setExpanded((prev) => !prev)
     } else {
       onSelect(node.path)
     }
-  }
+  }, [isDir, onSelect, node.path])
 
-  const handleContextMenu = (e: React.MouseEvent) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     if (!isDir) {
       setShowDelete(true)
     }
-  }
+  }, [isDir])
+
+  const handleNewFile = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    onNewFile(node.path)
+  }, [onNewFile, node.path])
+
+  const handleShowDelete = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDelete(true)
+  }, [])
 
   return (
     <div>
@@ -55,7 +65,7 @@ export function FileTreeNode({ node, depth, selectedPath, onSelect, onNewFile }:
         {/* Directory: new file button */}
         {isDir && (
           <button
-            onClick={(e) => { e.stopPropagation(); onNewFile(node.path) }}
+            onClick={handleNewFile}
             className="hidden group-hover:block px-1.5 text-gray-500 hover:text-gray-300 text-xs shrink-0 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded"
             title="새 파일"
           >
@@ -66,7 +76,7 @@ export function FileTreeNode({ node, depth, selectedPath, onSelect, onNewFile }:
         {/* File: delete button */}
         {!isDir && (
           <button
-            onClick={(e) => { e.stopPropagation(); setShowDelete(true) }}
+            onClick={handleShowDelete}
             className="hidden group-hover:block px-1.5 text-gray-500 hover:text-red-400 text-xs shrink-0 focus:outline-none focus:ring-1 focus:ring-red-500 rounded"
             title="삭제"
           >

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { AuthGate } from '@/components/auth/AuthGate'
 import { RepoSelector } from '@/components/layout/RepoSelector'
 import { FileTree } from '@/components/filetree/FileTree'
@@ -9,18 +9,16 @@ import { SearchModal } from '@/components/ui/SearchModal'
 import { useAuthStore } from '@/store/authStore'
 import { useRepoStore } from '@/store/repoStore'
 import { useEditorStore } from '@/store/editorStore'
+import { useOpenPath } from '@/hooks/useOpenPath'
 
 function Dashboard() {
   const { username, logout } = useAuthStore()
   const { owner, repo, branch } = useRepoStore()
-  const { openFile, openPath } = useEditorStore()
-  const isRepoConfigured = owner && repo
+  const openFile = useEditorStore((s) => s.openFile)
+  const isRepoConfigured = !!(owner && repo)
   const [showSearch, setShowSearch] = useState(false)
 
-  const handleFileSelect = useCallback(
-    (path: string) => { openPath(owner, repo, path) },
-    [openPath, owner, repo],
-  )
+  const handleFileSelect = useOpenPath()
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
