@@ -33,7 +33,16 @@ function resolveRelativePath(dirPath: string, relativeSrc: string): string {
 
 /** 이미지 src를 GitHub raw URL로 변환 (절대 URL이면 그대로) */
 function resolveImageSrc(src: string, currentFilePath: string, rawBaseUrl: string): string {
-  if (/^https?:\/\//i.test(src) || src.startsWith('data:')) return src
+  // 절대 URL, 프로토콜 상대(//) , blob:, data:, 절대 경로(/) 는 변환하지 않음
+  if (
+    /^https?:\/\//i.test(src) ||
+    src.startsWith('//') ||
+    src.startsWith('blob:') ||
+    src.startsWith('data:') ||
+    src.startsWith('/')
+  ) {
+    return src
+  }
   const dir = dirname(currentFilePath)
   const resolved = resolveRelativePath(dir, src)
   return `${rawBaseUrl}/${encodeURI(resolved)}`
