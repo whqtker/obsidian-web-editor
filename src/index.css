@@ -58,6 +58,14 @@ body {
   overflow-wrap: break-word;
 }
 
+/* Restore list markers removed by Tailwind v4 preflight (ol, ul { list-style: none }) */
+.markdown-body ul {
+  list-style-type: disc;
+}
+.markdown-body ol {
+  list-style-type: decimal;
+}
+
 /* Heading spacing: Velog-style larger gap above headings that follow paragraphs */
 .markdown-body p + h1,
 .markdown-body p + h2,
