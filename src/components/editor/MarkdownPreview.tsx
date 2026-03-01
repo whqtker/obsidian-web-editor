@@ -139,7 +139,7 @@ export function MarkdownPreview({ content, currentFilePath, onNavigate, wrapperR
   const imgComponent = useMemo(
     () => ({
       // node prop (hast element)은 DOM에 전달하지 않도록 destructure해서 제거
-      img: ({ src, alt, node: _node, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { node?: unknown }) => {
+      img: ({ src, alt, node: _, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { node?: unknown }) => {
         const resolvedSrc =
           src && currentFilePath ? resolveImageSrc(src, currentFilePath) : src
         return <GhImage src={resolvedSrc} alt={alt} owner={owner} repo={repo} {...props} />
