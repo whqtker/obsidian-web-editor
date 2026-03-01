@@ -56,7 +56,8 @@ function resolveImageSrc(src: string, currentFilePath: string): string {
   }
   const dir = dirname(currentFilePath)
   const resolved = resolveRelativePath(dir, src)
-  return `ghimg:${resolved}`
+  // 경로 내 공백 등을 encodeURI로 인코딩해야 CommonMark 파서가 URL로 정상 인식함
+  return `ghimg:${encodeURI(resolved)}`
 }
 
 /**
@@ -85,7 +86,8 @@ function GhImage({
       return
     }
 
-    const path = src.slice('ghimg:'.length)
+    // encodeURI로 인코딩된 경로를 decodeURI로 복원하여 GitHub API에 올바른 경로 전달
+    const path = decodeURI(src.slice('ghimg:'.length))
     const cacheKey = `${owner}/${repo}/${path}`
 
     const cached = imageUrlCache.get(cacheKey)
