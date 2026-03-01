@@ -11,7 +11,7 @@ interface FileTreeNodeProps {
 }
 
 export function FileTreeNode({ node, depth, selectedPath, onSelect, onNewFile }: FileTreeNodeProps) {
-  const [expanded, setExpanded] = useState(depth === 0)
+  const [expanded, setExpanded] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
   const isDir = node.type === 'directory'
   const isSelected = node.path === selectedPath
