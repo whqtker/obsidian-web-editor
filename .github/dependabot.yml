@@ -17,7 +17,6 @@ updates:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
       include: "scope"
-    insecure-external-code-execution: deny
     groups:
       codemirror:
         patterns:
