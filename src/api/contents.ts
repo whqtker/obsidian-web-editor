@@ -1,4 +1,4 @@
-import { getOctokitClient, rethrowWithAuthCheck } from './github'
+import { requireOctokit, rethrowWithAuthCheck } from './github'
 import { encodeBase64, decodeBase64 } from '@/utils/base64'
 
 export class ShaConflictError extends Error {
@@ -8,13 +8,24 @@ export class ShaConflictError extends Error {
   }
 }
 
+function assertNotObsidian(path: string): void {
+  if (path.startsWith('.obsidian/')) {
+    throw new Error('.obsidian/ 디렉토리에는 쓸 수 없습니다.')
+  }
+}
+
+function extractSha(data: { content?: { sha?: string } | null }): string {
+  const sha = data.content?.sha
+  if (!sha) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
+  return sha
+}
+
 export async function fetchFile(
   owner: string,
   repo: string,
   path: string,
 ): Promise<{ content: string; sha: string }> {
-  const octokit = getOctokitClient()
-  if (!octokit) throw new Error('인증이 필요합니다.')
+  const octokit = requireOctokit()
 
   try {
     const { data } = await octokit.rest.repos.getContent({ owner, repo, path })
@@ -32,8 +43,7 @@ export async function fetchImageUrl(
   repo: string,
   path: string,
 ): Promise<{ downloadUrl: string; sha: string }> {
-  const octokit = getOctokitClient()
-  if (!octokit) throw new Error('인증이 필요합니다.')
+  const octokit = requireOctokit()
 
   try {
     const { data } = await octokit.rest.repos.getContent({ owner, repo, path })
@@ -55,12 +65,8 @@ export async function saveFile(params: {
   message: string
   branch?: string
 }): Promise<{ sha: string }> {
-  const octokit = getOctokitClient()
-  if (!octokit) throw new Error('인증이 필요합니다.')
-
-  if (params.path.startsWith('.obsidian/')) {
-    throw new Error('.obsidian/ 디렉토리에는 쓸 수 없습니다.')
-  }
+  const octokit = requireOctokit()
+  assertNotObsidian(params.path)
 
   try {
     const { data } = await octokit.rest.repos.createOrUpdateFileContents({
@@ -72,9 +78,7 @@ export async function saveFile(params: {
       sha: params.sha,
       branch: params.branch,
     })
-    const sha = data.content?.sha
-    if (!sha) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
-    return { sha }
+    return { sha: extractSha(data) }
   } catch (err: unknown) {
     if (err && typeof err === 'object' && 'status' in err && err.status === 409) {
       throw new ShaConflictError(params.path)
@@ -91,12 +95,8 @@ export async function createFile(params: {
   message: string
   branch?: string
 }): Promise<{ sha: string }> {
-  const octokit = getOctokitClient()
-  if (!octokit) throw new Error('인증이 필요합니다.')
-
-  if (params.path.startsWith('.obsidian/')) {
-    throw new Error('.obsidian/ 디렉토리에는 쓸 수 없습니다.')
-  }
+  const octokit = requireOctokit()
+  assertNotObsidian(params.path)
 
   try {
     const { data } = await octokit.rest.repos.createOrUpdateFileContents({
@@ -107,9 +107,7 @@ export async function createFile(params: {
       content: encodeBase64(params.content),
       branch: params.branch,
     })
-    const sha = data.content?.sha
-    if (!sha) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
-    return { sha }
+    return { sha: extractSha(data) }
   } catch (err) {
     rethrowWithAuthCheck(err)
   }
@@ -123,12 +121,8 @@ export async function uploadBinaryFile(params: {
   message: string
   branch?: string
 }): Promise<{ sha: string }> {
-  const octokit = getOctokitClient()
-  if (!octokit) throw new Error('인증이 필요합니다.')
-
-  if (params.path.startsWith('.obsidian/')) {
-    throw new Error('.obsidian/ 디렉토리에는 쓸 수 없습니다.')
-  }
+  const octokit = requireOctokit()
+  assertNotObsidian(params.path)
 
   try {
     const { data } = await octokit.rest.repos.createOrUpdateFileContents({
@@ -139,9 +133,7 @@ export async function uploadBinaryFile(params: {
       content: params.base64Content,
       branch: params.branch,
     })
-    const sha = data.content?.sha
-    if (!sha) throw new Error('저장 후 파일 정보를 받지 못했습니다.')
-    return { sha }
+    return { sha: extractSha(data) }
   } catch (err) {
     rethrowWithAuthCheck(err)
   }
@@ -155,12 +147,8 @@ export async function deleteFile(params: {
   message: string
   branch?: string
 }): Promise<void> {
-  const octokit = getOctokitClient()
-  if (!octokit) throw new Error('인증이 필요합니다.')
-
-  if (params.path.startsWith('.obsidian/')) {
-    throw new Error('.obsidian/ 디렉토리에는 쓸 수 없습니다.')
-  }
+  const octokit = requireOctokit()
+  assertNotObsidian(params.path)
 
   try {
     await octokit.rest.repos.deleteFile({

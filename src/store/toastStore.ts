@@ -11,13 +11,16 @@ export interface Toast {
 
 interface ToastState {
   toasts: Toast[]
+}
+
+interface ToastActions {
   addToast: (type: ToastType, message: string) => void
   removeToast: (id: string) => void
 }
 
 let nextId = 0
 
-export const useToastStore = create<ToastState>()((set, get) => ({
+export const useToastStore = create<ToastState & ToastActions>()((set, get) => ({
   toasts: [],
 
   addToast: (type, message) => {

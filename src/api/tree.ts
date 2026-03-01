@@ -1,4 +1,4 @@
-import { getOctokitClient, rethrowWithAuthCheck } from './github'
+import { requireOctokit, rethrowWithAuthCheck } from './github'
 import type { GitHubTreeNode, GitHubTreeResponse } from '@/types/github'
 
 export async function fetchFullTree(
@@ -6,8 +6,7 @@ export async function fetchFullTree(
   repo: string,
   branch: string,
 ): Promise<{ nodes: GitHubTreeNode[]; truncated: boolean }> {
-  const octokit = getOctokitClient()
-  if (!octokit) throw new Error('인증이 필요합니다.')
+  const octokit = requireOctokit()
 
   try {
     const { data: ref } = await octokit.rest.git.getRef({
