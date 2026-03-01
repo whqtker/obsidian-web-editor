@@ -1,15 +1,18 @@
 import { basename, isImage } from '@/utils/pathUtils'
 
-const WIKILINK_RE = /\[\[([^\]]+)\]\]/g
+// !? 로 선행 ! (Obsidian 임베드 문법)를 매칭 범위에 포함시켜 교체 시 이중 ! 생성을 방지
+const WIKILINK_RE = /!?\[\[([^\]]+)\]\]/g
 const HAS_EXTENSION_RE = /\.[^./]+$/
 
 /**
- * Replace [[wikilinks]] with markdown links for react-markdown to render.
- * Image wikilinks are converted to real GitHub raw URLs when rawBaseUrl is provided.
+ * Replace [[wikilinks]] and ![[embeds]] with markdown links for react-markdown to render.
+ * Image embed wikilinks (![[image.png]]) are converted to real GitHub raw URLs when rawBaseUrl is provided.
  * Unresolved links get a strikethrough style.
  */
 export function replaceWikiLinks(content: string, allPaths: string[], rawBaseUrl?: string): string {
-  return content.replace(WIKILINK_RE, (_match, inner: string) => {
+  return content.replace(WIKILINK_RE, (match, inner: string) => {
+    const isEmbed = match.startsWith('!')
+
     let target = inner
     let display: string | undefined
 
@@ -30,9 +33,11 @@ export function replaceWikiLinks(content: string, allPaths: string[], rawBaseUrl
     const label = display || target || heading.slice(1)
 
     if (resolved) {
-      if (rawBaseUrl && isImage(resolved)) {
+      // 이미지 임베드: ![[image.png]] → ![alt](rawUrl)
+      if (isEmbed && rawBaseUrl && isImage(resolved)) {
         return `![${label}](${rawBaseUrl}/${encodeURI(resolved)})`
       }
+      // 일반 위키링크 (이미지 포함): [[...]] → wikilink 앵커
       return `[${label}](wikilink:${resolved}${heading})`
     }
     return `~~${label}~~`
