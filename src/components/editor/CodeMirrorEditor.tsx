@@ -28,7 +28,7 @@ export function CodeMirrorEditor({ value, onChange, readOnly, onImageUpload, edi
       changes: { from: cursor, insert: text },
       selection: { anchor: cursor + text.length },
     })
-  }, [])
+  }, [editorRef])
 
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {

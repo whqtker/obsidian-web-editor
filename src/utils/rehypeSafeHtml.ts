@@ -7,35 +7,40 @@
  *  - on* event handler attributes (onclick, onerror, …)
  *  - javascript:/data:/vbscript: in href/src/action attributes
  */
-import type { Root } from 'hast'
+import type { Root, Element, RootContent } from 'hast'
 
 const DANGEROUS_SCHEME = /^(javascript|data|vbscript):/i
+const URL_ATTRS = new Set(['href', 'src', 'action', 'formAction'])
 
-function walk(node: any, parent: any, index: number): number {
+type Parent = { children: RootContent[] }
+
+function walk(node: RootContent | Root, parent: Parent | null, index: number): number {
   if (node.type === 'element') {
-    if ((node.tagName === 'script' || node.tagName === 'style') && parent) {
+    const el = node as Element
+    if ((el.tagName === 'script' || el.tagName === 'style') && parent) {
       parent.children.splice(index, 1)
       return index - 1
     }
-    if (node.properties) {
-      for (const key of Object.keys(node.properties as Record<string, unknown>)) {
+    if (el.properties) {
+      for (const key of Object.keys(el.properties)) {
         if (/^on[A-Za-z]/.test(key)) {
-          delete (node.properties as any)[key]
+          delete el.properties[key]
           continue
         }
-        if (['href', 'src', 'action', 'formAction'].includes(key)) {
-          const val = (node.properties as any)[key]
+        if (URL_ATTRS.has(key)) {
+          const val = el.properties[key]
           if (typeof val === 'string' && DANGEROUS_SCHEME.test(val.trim())) {
-            delete (node.properties as any)[key]
+            delete el.properties[key]
           }
         }
       }
     }
   }
-  if (Array.isArray(node.children)) {
+  const children = (node as Root).children as RootContent[] | undefined
+  if (Array.isArray(children)) {
     let i = 0
-    while (i < node.children.length) {
-      i = walk(node.children[i], node, i) + 1
+    while (i < children.length) {
+      i = walk(children[i], node as Parent, i) + 1
     }
   }
   return index
