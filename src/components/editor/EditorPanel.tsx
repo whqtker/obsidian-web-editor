@@ -12,9 +12,10 @@ import { Spinner } from '@/components/ui/Spinner'
 import { useImageUpload } from '@/hooks/useImageUpload'
 import { useScrollSync } from '@/hooks/useScrollSync'
 import { useResizable } from '@/hooks/useResizable'
+import { useOpenPath } from '@/hooks/useOpenPath'
 
 export function EditorPanel() {
-  const { openFile, isLoading, error, showPreview, updateContent, save, openPath } = useEditorStore()
+  const { openFile, isLoading, error, showPreview, updateContent, save } = useEditorStore()
   const { owner, repo, branch } = useRepoStore()
   const addToast = useToastStore((s) => s.addToast)
   const { uploadImage } = useImageUpload()
@@ -24,10 +25,7 @@ export function EditorPanel() {
 
   useScrollSync(editorRef, previewRef, showPreview)
 
-  const handleNavigate = useCallback(
-    (path: string) => { openPath(owner, repo, path) },
-    [openPath, owner, repo],
-  )
+  const handleNavigate = useOpenPath()
 
   const handleSave = useCallback(async () => {
     try {
@@ -83,7 +81,7 @@ export function EditorPanel() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <EditorToolbar />
+      <EditorToolbar onSave={handleSave} />
       <MarkdownToolbar editorRef={editorRef} />
       <div
         ref={containerRef}
@@ -112,8 +110,7 @@ export function EditorPanel() {
               title="드래그하여 크기 조절 / 더블클릭으로 초기화"
             />
             <div
-              className="min-h-0 overflow-hidden flex-1"
-              style={{ pointerEvents: isDragging ? 'none' : undefined }}
+              className={`min-h-0 overflow-hidden flex-1${isDragging ? ' pointer-events-none' : ''}`}
             >
               <MarkdownPreview
                 content={openFile.content}

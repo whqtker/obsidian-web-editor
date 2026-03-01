@@ -1,6 +1,7 @@
 import { basename, isImage } from '@/utils/pathUtils'
 
 const WIKILINK_RE = /\[\[([^\]]+)\]\]/g
+const HAS_EXTENSION_RE = /\.[^./]+$/
 
 /**
  * Replace [[wikilinks]] with markdown links for react-markdown to render.
@@ -49,7 +50,7 @@ function resolveWikiLink(
   if (!target) return null
 
   // Image files and files with explicit extensions are not .md — don't append suffix
-  const hasExtension = /\.[^./]+$/.test(target)
+  const hasExtension = HAS_EXTENSION_RE.test(target)
   const normalized = hasExtension ? target : `${target}.md`
 
   // Exact path match
