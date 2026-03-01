@@ -1,5 +1,5 @@
 import { useMemo, useCallback, useState, useEffect, type RefObject } from 'react'
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown, { defaultUrlTransform } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkMath from 'remark-math'
@@ -70,10 +70,11 @@ function GhImage({
   alt,
   owner,
   repo,
+  branch,
   // react-markdown이 주입하는 hast node 객체 — DOM <img>에 전달하지 않도록 제거
   node: _,
   ...domProps
-}: React.ImgHTMLAttributes<HTMLImageElement> & { owner: string; repo: string; node?: unknown }) {
+}: React.ImgHTMLAttributes<HTMLImageElement> & { owner: string; repo: string; branch: string; node?: unknown }) {
   const [resolvedUrl, setResolvedUrl] = useState<string | undefined>(undefined)
   const [failed, setFailed] = useState(false)
 
@@ -86,9 +87,10 @@ function GhImage({
       return
     }
 
+    const controller = new AbortController()
     // encodeURI로 인코딩된 경로를 decodeURI로 복원하여 GitHub API에 올바른 경로 전달
     const path = decodeURI(src.slice('ghimg:'.length))
-    const cacheKey = `${owner}/${repo}/${path}`
+    const cacheKey = `${owner}/${repo}/${branch}/${path}`
 
     const cached = imageUrlCache.get(cacheKey)
     if (cached) {
@@ -99,13 +101,19 @@ function GhImage({
 
     setResolvedUrl(undefined)
     setFailed(false)
-    fetchImageUrl(owner, repo, path)
+    fetchImageUrl(owner, repo, path, branch)
       .then(({ downloadUrl }) => {
+        if (controller.signal.aborted) return
         imageUrlCache.set(cacheKey, downloadUrl)
         setResolvedUrl(downloadUrl)
       })
-      .catch(() => setFailed(true))
-  }, [src, owner, repo])
+      .catch(() => {
+        if (controller.signal.aborted) return
+        setFailed(true)
+      })
+
+    return () => controller.abort()
+  }, [src, owner, repo, branch])
 
   if (failed) {
     return <span className="text-xs text-red-400 font-mono">[이미지 로드 실패: {alt}]</span>
@@ -119,7 +127,9 @@ function GhImage({
 export function MarkdownPreview({ content, currentFilePath, onNavigate, wrapperRef }: MarkdownPreviewProps) {
   const flatNodes = useTreeStore((s) => s.flatNodes)
   const allPaths = useMemo(() => flatNodes.map((n) => n.path), [flatNodes])
-  const { owner, repo } = useRepoStore()
+  const owner = useRepoStore((s) => s.owner)
+  const repo = useRepoStore((s) => s.repo)
+  const branch = useRepoStore((s) => s.branch)
 
   const processed = useMemo(
     () => replaceTagsForPreview(replaceWikiLinks(content, allPaths)),
@@ -148,10 +158,19 @@ export function MarkdownPreview({ content, currentFilePath, onNavigate, wrapperR
       img: ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { node?: unknown }) => {
         const resolvedSrc =
           src && currentFilePath ? resolveImageSrc(src, currentFilePath) : src
-        return <GhImage src={resolvedSrc} alt={alt} owner={owner} repo={repo} {...props} />
+        return <GhImage src={resolvedSrc} alt={alt} owner={owner} repo={repo} branch={branch} {...props} />
       },
     }),
-    [currentFilePath, owner, repo],
+    [currentFilePath, owner, repo, branch],
+  )
+
+  // ghimg:, wikilink: 커스텀 스킴은 defaultUrlTransform이 빈 문자열로 교체하므로 예외 처리
+  const urlTransform = useCallback(
+    (url: string) => {
+      if (url.startsWith('ghimg:') || url.startsWith('wikilink:')) return url
+      return defaultUrlTransform(url)
+    },
+    [],
   )
 
   return (
@@ -161,6 +180,7 @@ export function MarkdownPreview({ content, currentFilePath, onNavigate, wrapperR
       onClick={handleClick}
     >
       <ReactMarkdown
+        urlTransform={urlTransform}
         remarkPlugins={[remarkGfm, remarkFrontmatter, remarkMath]}
         rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeSlug, rehypeKatex, rehypeSafeHtml]}
         components={imgComponent}
