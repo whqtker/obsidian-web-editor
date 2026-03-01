@@ -23,6 +23,11 @@ export function getOctokitClient(): Octokit | null {
   return octokitInstance
 }
 
+export function requireOctokit(): Octokit {
+  if (!octokitInstance) throw new Error('인증이 필요합니다.')
+  return octokitInstance
+}
+
 export function clearOctokitClient(): void {
   octokitInstance = null
 }

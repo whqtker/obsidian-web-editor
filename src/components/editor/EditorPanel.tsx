@@ -1,24 +1,31 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
+import type { ReactCodeMirrorRef } from '@uiw/react-codemirror'
 import { useEditorStore } from '@/store/editorStore'
 import { useRepoStore } from '@/store/repoStore'
 import { useToastStore } from '@/store/toastStore'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
 import { MarkdownPreview } from './MarkdownPreview'
 import { EditorToolbar } from './EditorToolbar'
+import { MarkdownToolbar } from './MarkdownToolbar'
 import { ImageViewer } from './ImageViewer'
 import { Spinner } from '@/components/ui/Spinner'
 import { useImageUpload } from '@/hooks/useImageUpload'
+import { useScrollSync } from '@/hooks/useScrollSync'
+import { useResizable } from '@/hooks/useResizable'
+import { useOpenPath } from '@/hooks/useOpenPath'
 
 export function EditorPanel() {
-  const { openFile, isLoading, error, showPreview, updateContent, save, openPath } = useEditorStore()
+  const { openFile, isLoading, error, showPreview, updateContent, save } = useEditorStore()
   const { owner, repo, branch } = useRepoStore()
   const addToast = useToastStore((s) => s.addToast)
   const { uploadImage } = useImageUpload()
+  const editorRef = useRef<ReactCodeMirrorRef>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
+  const { leftRatio, isDragging, handleMouseDown, handleDoubleClick, containerRef } = useResizable()
 
-  const handleNavigate = useCallback(
-    (path: string) => { openPath(owner, repo, path) },
-    [openPath, owner, repo],
-  )
+  useScrollSync(editorRef, previewRef, showPreview)
+
+  const handleNavigate = useOpenPath()
 
   const handleSave = useCallback(async () => {
     try {
@@ -74,15 +81,45 @@ export function EditorPanel() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <EditorToolbar />
-      <div className="flex-1 min-h-0 flex">
-        <div className={`${showPreview ? 'w-1/2 border-r border-gray-800' : 'w-full'} min-h-0 overflow-hidden`}>
-          <CodeMirrorEditor value={openFile.content} onChange={updateContent} onImageUpload={uploadImage} />
+      <EditorToolbar onSave={handleSave} />
+      <MarkdownToolbar editorRef={editorRef} />
+      <div
+        ref={containerRef}
+        className={`flex-1 min-h-0 flex${isDragging ? ' select-none' : ''}`}
+      >
+        <div
+          className="min-h-0 overflow-hidden"
+          style={{ width: showPreview ? `${leftRatio * 100}%` : '100%' }}
+        >
+          <CodeMirrorEditor
+            value={openFile.content}
+            onChange={updateContent}
+            onImageUpload={uploadImage}
+            editorRef={editorRef}
+          />
         </div>
         {showPreview && (
-          <div className="w-1/2 min-h-0 overflow-hidden">
-            <MarkdownPreview content={openFile.content} onNavigate={handleNavigate} />
-          </div>
+          <>
+            {/* 드래그 핸들 */}
+            <div
+              className={`w-1 flex-shrink-0 cursor-col-resize transition-colors hover:bg-indigo-500/50 ${
+                isDragging ? 'bg-indigo-500/70' : 'bg-gray-800'
+              }`}
+              onMouseDown={handleMouseDown}
+              onDoubleClick={handleDoubleClick}
+              title="드래그하여 크기 조절 / 더블클릭으로 초기화"
+            />
+            <div
+              className={`min-h-0 overflow-hidden flex-1${isDragging ? ' pointer-events-none' : ''}`}
+            >
+              <MarkdownPreview
+                content={openFile.content}
+                currentFilePath={openFile.path}
+                onNavigate={handleNavigate}
+                wrapperRef={previewRef}
+              />
+            </div>
+          </>
         )}
       </div>
     </div>

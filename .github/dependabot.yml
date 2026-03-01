@@ -1,0 +1,70 @@
+version: 2
+
+updates:
+  # npm 의존성 모니터링
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Seoul"
+    target-branch: "develop"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+      include: "scope"
+    groups:
+      codemirror:
+        patterns:
+          - "@codemirror/*"
+          - "@uiw/react-codemirror"
+          - "@lezer/*"
+      remark-rehype:
+        patterns:
+          - "remark-*"
+          - "rehype-*"
+          - "react-markdown"
+          - "katex"
+          - "@types/katex"
+      testing:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+          - "@testing-library/*"
+          - "jsdom"
+          - "msw"
+      lint-types:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "typescript*"
+          - "typescript-eslint"
+          - "globals"
+          - "@types/*"
+        update-types:
+          - "minor"
+          - "patch"
+      minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions 모니터링
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Seoul"
+    target-branch: "develop"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"

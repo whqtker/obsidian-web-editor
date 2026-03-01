@@ -1,20 +1,14 @@
 import { useEditorStore } from '@/store/editorStore'
-import { useRepoStore } from '@/store/repoStore'
 import { basename } from '@/utils/pathUtils'
 
-export function EditorToolbar() {
-  const { openFile, isSaving, showPreview, save, closeFile, togglePreview } = useEditorStore()
-  const { owner, repo, branch } = useRepoStore()
+interface EditorToolbarProps {
+  onSave: () => Promise<void>
+}
+
+export function EditorToolbar({ onSave }: EditorToolbarProps) {
+  const { openFile, isSaving, showPreview, closeFile, togglePreview } = useEditorStore()
 
   if (!openFile) return null
-
-  const handleSave = async () => {
-    try {
-      await save(owner, repo, undefined, branch)
-    } catch {
-      // error shown via store
-    }
-  }
 
   return (
     <div className="flex items-center justify-between px-3 py-1.5 border-b border-gray-800 shrink-0">
@@ -39,7 +33,7 @@ export function EditorToolbar() {
           미리보기
         </button>
         <button
-          onClick={handleSave}
+          onClick={onSave}
           disabled={!openFile.isDirty || isSaving}
           className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500 text-white rounded transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
