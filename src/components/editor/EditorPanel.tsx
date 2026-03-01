@@ -1,10 +1,12 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
+import type { ReactCodeMirrorRef } from '@uiw/react-codemirror'
 import { useEditorStore } from '@/store/editorStore'
 import { useRepoStore } from '@/store/repoStore'
 import { useToastStore } from '@/store/toastStore'
 import { CodeMirrorEditor } from './CodeMirrorEditor'
 import { MarkdownPreview } from './MarkdownPreview'
 import { EditorToolbar } from './EditorToolbar'
+import { MarkdownToolbar } from './MarkdownToolbar'
 import { ImageViewer } from './ImageViewer'
 import { Spinner } from '@/components/ui/Spinner'
 import { useImageUpload } from '@/hooks/useImageUpload'
@@ -14,6 +16,7 @@ export function EditorPanel() {
   const { owner, repo, branch } = useRepoStore()
   const addToast = useToastStore((s) => s.addToast)
   const { uploadImage } = useImageUpload()
+  const editorRef = useRef<ReactCodeMirrorRef>(null)
 
   const handleNavigate = useCallback(
     (path: string) => { openPath(owner, repo, path) },
@@ -75,9 +78,10 @@ export function EditorPanel() {
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <EditorToolbar />
+      <MarkdownToolbar editorRef={editorRef} />
       <div className="flex-1 min-h-0 flex">
         <div className={`${showPreview ? 'w-1/2 border-r border-gray-800' : 'w-full'} min-h-0 overflow-hidden`}>
-          <CodeMirrorEditor value={openFile.content} onChange={updateContent} onImageUpload={uploadImage} />
+          <CodeMirrorEditor value={openFile.content} onChange={updateContent} onImageUpload={uploadImage} editorRef={editorRef} />
         </div>
         {showPreview && (
           <div className="w-1/2 min-h-0 overflow-hidden">

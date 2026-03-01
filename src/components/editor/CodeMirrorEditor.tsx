@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useRef } from 'react'
+import { useMemo, useCallback, useRef, type RefObject } from 'react'
 import CodeMirror, { type ReactCodeMirrorRef } from '@uiw/react-codemirror'
 import { markdown, markdownLanguage } from '@codemirror/lang-markdown'
 import { languages } from '@codemirror/language-data'
@@ -12,11 +12,13 @@ interface CodeMirrorEditorProps {
   onChange: (value: string) => void
   readOnly?: boolean
   onImageUpload?: (file: File) => Promise<string | null>
+  editorRef?: RefObject<ReactCodeMirrorRef>
 }
 
-export function CodeMirrorEditor({ value, onChange, readOnly, onImageUpload }: CodeMirrorEditorProps) {
+export function CodeMirrorEditor({ value, onChange, readOnly, onImageUpload, editorRef: externalRef }: CodeMirrorEditorProps) {
   const flatNodes = useTreeStore((s) => s.flatNodes)
-  const editorRef = useRef<ReactCodeMirrorRef>(null)
+  const internalRef = useRef<ReactCodeMirrorRef>(null)
+  const editorRef = (externalRef ?? internalRef) as RefObject<ReactCodeMirrorRef>
 
   const insertText = useCallback((text: string) => {
     const view = editorRef.current?.view
