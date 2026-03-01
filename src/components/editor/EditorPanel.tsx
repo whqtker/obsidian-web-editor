@@ -11,6 +11,7 @@ import { ImageViewer } from './ImageViewer'
 import { Spinner } from '@/components/ui/Spinner'
 import { useImageUpload } from '@/hooks/useImageUpload'
 import { useScrollSync } from '@/hooks/useScrollSync'
+import { useResizable } from '@/hooks/useResizable'
 
 export function EditorPanel() {
   const { openFile, isLoading, error, showPreview, updateContent, save, openPath } = useEditorStore()
@@ -19,6 +20,7 @@ export function EditorPanel() {
   const { uploadImage } = useImageUpload()
   const editorRef = useRef<ReactCodeMirrorRef>(null)
   const previewRef = useRef<HTMLDivElement>(null)
+  const { leftRatio, isDragging, handleMouseDown, handleDoubleClick, containerRef } = useResizable()
 
   useScrollSync(editorRef, previewRef, showPreview)
 
@@ -83,14 +85,43 @@ export function EditorPanel() {
     <div className="flex-1 flex flex-col min-h-0">
       <EditorToolbar />
       <MarkdownToolbar editorRef={editorRef} />
-      <div className="flex-1 min-h-0 flex">
-        <div className={`${showPreview ? 'w-1/2 border-r border-gray-800' : 'w-full'} min-h-0 overflow-hidden`}>
-          <CodeMirrorEditor value={openFile.content} onChange={updateContent} onImageUpload={uploadImage} editorRef={editorRef} />
+      <div
+        ref={containerRef}
+        className={`flex-1 min-h-0 flex${isDragging ? ' select-none' : ''}`}
+      >
+        <div
+          className="min-h-0 overflow-hidden"
+          style={{ width: showPreview ? `${leftRatio * 100}%` : '100%' }}
+        >
+          <CodeMirrorEditor
+            value={openFile.content}
+            onChange={updateContent}
+            onImageUpload={uploadImage}
+            editorRef={editorRef}
+          />
         </div>
         {showPreview && (
-          <div className="w-1/2 min-h-0 overflow-hidden">
-          <MarkdownPreview content={openFile.content} onNavigate={handleNavigate} wrapperRef={previewRef} />
-          </div>
+          <>
+            {/* 드래그 핸들 */}
+            <div
+              className={`w-1 flex-shrink-0 cursor-col-resize transition-colors hover:bg-indigo-500/50 ${
+                isDragging ? 'bg-indigo-500/70' : 'bg-gray-800'
+              }`}
+              onMouseDown={handleMouseDown}
+              onDoubleClick={handleDoubleClick}
+              title="드래그하여 크기 조절 / 더블클릭으로 초기화"
+            />
+            <div
+              className="min-h-0 overflow-hidden flex-1"
+              style={{ pointerEvents: isDragging ? 'none' : undefined }}
+            >
+              <MarkdownPreview
+                content={openFile.content}
+                onNavigate={handleNavigate}
+                wrapperRef={previewRef}
+              />
+            </div>
+          </>
         )}
       </div>
     </div>
