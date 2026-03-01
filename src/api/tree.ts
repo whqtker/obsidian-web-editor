@@ -24,11 +24,12 @@ export async function fetchFullTree(
       repo,
       tree_sha: commitSha,
       recursive: 'true',
-    }) as { data: GitHubTreeResponse }
+    })
+    const treeData = data as GitHubTreeResponse
 
     return {
-      nodes: data.tree,
-      truncated: data.truncated,
+      nodes: treeData.tree,
+      truncated: treeData.truncated,
     }
   } catch (err) {
     rethrowWithAuthCheck(err)

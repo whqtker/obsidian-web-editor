@@ -10,6 +10,6 @@ export function encodeBase64(text: string): string {
 export function decodeBase64(base64: string): string {
   const cleaned = base64.replace(/\n/g, '')
   const binString = atob(cleaned)
-  const bytes = Uint8Array.from(binString, (c) => c.codePointAt(0)!)
+  const bytes = Uint8Array.from(binString, (c) => c.charCodeAt(0))
   return decoder.decode(bytes)
 }

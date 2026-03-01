@@ -42,7 +42,7 @@ export function replaceWikiLinks(content: string, allPaths: string[], rawBaseUrl
  * Resolve a wikilink target to a full file path.
  * Obsidian uses shortest-path matching: "note" matches "folder/note.md"
  */
-export function resolveWikiLink(
+function resolveWikiLink(
   target: string,
   allPaths: string[],
 ): string | null {

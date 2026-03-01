@@ -25,22 +25,6 @@ export interface GitHubTreeResponse {
   truncated: boolean;
 }
 
-export interface CommitResult {
-  commit: {
-    sha: string;
-    message: string;
-    html_url: string;
-  };
-  content: GitHubFile;
-}
-
-export interface RateLimitInfo {
-  limit: number;
-  remaining: number;
-  resetAt: Date;
-  used: number;
-}
-
 export interface UserRepo {
   owner: string;
   name: string;

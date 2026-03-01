@@ -1,6 +1,5 @@
 import { getOctokitClient, rethrowWithAuthCheck } from './github'
 import { encodeBase64, decodeBase64 } from '@/utils/base64'
-import type { GitHubFile } from '@/types/github'
 
 export class ShaConflictError extends Error {
   constructor(public path: string) {
@@ -19,11 +18,10 @@ export async function fetchFile(
 
   try {
     const { data } = await octokit.rest.repos.getContent({ owner, repo, path })
-    const file = data as GitHubFile
-    if (file.type !== 'file' || file.content === undefined) {
+    if (Array.isArray(data) || data.type !== 'file' || data.content === undefined) {
       throw new Error(`${path}은(는) 파일이 아닙니다.`)
     }
-    return { content: decodeBase64(file.content), sha: file.sha }
+    return { content: decodeBase64(data.content), sha: data.sha }
   } catch (err) {
     rethrowWithAuthCheck(err)
   }
@@ -39,11 +37,10 @@ export async function fetchImageUrl(
 
   try {
     const { data } = await octokit.rest.repos.getContent({ owner, repo, path })
-    const file = data as GitHubFile
-    if (file.type !== 'file' || !file.download_url) {
+    if (Array.isArray(data) || data.type !== 'file' || !data.download_url) {
       throw new Error(`${path}은(는) 이미지 파일이 아닙니다.`)
     }
-    return { downloadUrl: file.download_url, sha: file.sha }
+    return { downloadUrl: data.download_url, sha: data.sha }
   } catch (err) {
     rethrowWithAuthCheck(err)
   }
