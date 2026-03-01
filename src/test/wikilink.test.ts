@@ -12,13 +12,13 @@ describe('replaceWikiLinks — 이미지 임베드 (![[...]])', () => {
   it('![[image.png]] → ghimg: 커스텀 스킴 이미지 마크다운으로 변환', () => {
     const result = replaceWikiLinks('![[Pasted image 20260208223213.png]]', ALL_PATHS)
     expect(result).toBe(
-      '![Pasted image 20260208223213.png](ghimg:attachments/Pasted image 20260208223213.png)',
+      '![Pasted image 20260208223213.png](ghimg:attachments/Pasted%20image%2020260208223213.png)',
     )
   })
 
   it('![[image.png|alt text]] → alt 텍스트 사용', () => {
     const result = replaceWikiLinks('![[Pasted image 20260208223213.png|내 사진]]', ALL_PATHS)
-    expect(result).toBe('![내 사진](ghimg:attachments/Pasted image 20260208223213.png)')
+    expect(result).toBe('![내 사진](ghimg:attachments/Pasted%20image%2020260208223213.png)')
   })
 
   it('이중 ! 미생성 — 결과가 !! 로 시작하지 않아야 함', () => {
@@ -67,7 +67,7 @@ describe('replaceWikiLinks — 문장 내 혼합 사용', () => {
       ALL_PATHS,
     )
     expect(result).toContain(
-      '![Pasted image 20260208223213.png](ghimg:attachments/Pasted image 20260208223213.png)',
+      '![Pasted image 20260208223213.png](ghimg:attachments/Pasted%20image%2020260208223213.png)',
     )
     expect(result).not.toContain('!![[')
     expect(result).not.toContain('!![')

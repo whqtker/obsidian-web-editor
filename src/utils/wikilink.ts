@@ -35,10 +35,11 @@ export function replaceWikiLinks(content: string, allPaths: string[]): string {
     const label = display || target || heading.slice(1)
 
     if (resolved) {
-      // 이미지 임베드: ![[image.png]] → ![alt](ghimg:path)
-      // ghimg: 커스텀 스킴은 MarkdownPreview의 img 컴포넌트에서 GitHub API로 인증된 URL로 교체됨
+      // 이미지 임베드: ![[image.png]] → ![alt](ghimg:encoded-path)
+      // 경로 내 공백 등을 encodeURI로 인코딩해야 CommonMark 파서가 URL로 정상 인식함
+      // GhImage 컴포넌트에서 decodeURI로 복원한 뒤 GitHub API를 호출함
       if (isEmbed && isImage(resolved)) {
-        return `![${label}](ghimg:${resolved})`
+        return `![${label}](ghimg:${encodeURI(resolved)})`
       }
       // 일반 위키링크 (이미지 포함): [[...]] → wikilink 앵커
       return `[${label}](wikilink:${resolved}${heading})`
