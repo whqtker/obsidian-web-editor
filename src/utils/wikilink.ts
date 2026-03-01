@@ -6,10 +6,12 @@ const HAS_EXTENSION_RE = /\.[^./]+$/
 
 /**
  * Replace [[wikilinks]] and ![[embeds]] with markdown links for react-markdown to render.
- * Image embed wikilinks (![[image.png]]) are converted to real GitHub raw URLs when rawBaseUrl is provided.
+ * Image embed wikilinks (![[image.png]]) are converted to ghimg:<path> custom scheme.
+ * The custom img component in MarkdownPreview resolves ghimg: URLs via the authenticated GitHub API,
+ * which enables image display in private repositories.
  * Unresolved links get a strikethrough style.
  */
-export function replaceWikiLinks(content: string, allPaths: string[], rawBaseUrl?: string): string {
+export function replaceWikiLinks(content: string, allPaths: string[]): string {
   return content.replace(WIKILINK_RE, (match, inner: string) => {
     const isEmbed = match.startsWith('!')
 
@@ -33,9 +35,10 @@ export function replaceWikiLinks(content: string, allPaths: string[], rawBaseUrl
     const label = display || target || heading.slice(1)
 
     if (resolved) {
-      // 이미지 임베드: ![[image.png]] → ![alt](rawUrl)
-      if (isEmbed && rawBaseUrl && isImage(resolved)) {
-        return `![${label}](${rawBaseUrl}/${encodeURI(resolved)})`
+      // 이미지 임베드: ![[image.png]] → ![alt](ghimg:path)
+      // ghimg: 커스텀 스킴은 MarkdownPreview의 img 컴포넌트에서 GitHub API로 인증된 URL로 교체됨
+      if (isEmbed && isImage(resolved)) {
+        return `![${label}](ghimg:${resolved})`
       }
       // 일반 위키링크 (이미지 포함): [[...]] → wikilink 앵커
       return `[${label}](wikilink:${resolved}${heading})`

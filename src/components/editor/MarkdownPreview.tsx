@@ -1,4 +1,4 @@
-import { useMemo, useCallback, type RefObject } from 'react'
+import { useMemo, useCallback, useState, useEffect, type RefObject } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkFrontmatter from 'remark-frontmatter'
@@ -13,6 +13,13 @@ import { replaceWikiLinks } from '@/utils/wikilink'
 import { replaceTagsForPreview } from '@/utils/tags'
 import { rehypeSafeHtml } from '@/utils/rehypeSafeHtml'
 import { dirname } from '@/utils/pathUtils'
+import { fetchImageUrl } from '@/api/contents'
+
+/**
+ * ghimg:<path> → GitHub API download_url 캐시
+ * key: `${owner}/${repo}/${path}`, value: 인증된 download_url
+ */
+const imageUrlCache = new Map<string, string>()
 
 interface MarkdownPreviewProps {
   content: string
@@ -31,32 +38,86 @@ function resolveRelativePath(dirPath: string, relativeSrc: string): string {
   return parts.join('/')
 }
 
-/** 이미지 src를 GitHub raw URL로 변환 (절대 URL이면 그대로) */
-function resolveImageSrc(src: string, currentFilePath: string, rawBaseUrl: string): string {
-  // 절대 URL, 프로토콜 상대(//) , blob:, data:, 절대 경로(/) 는 변환하지 않음
+/**
+ * 이미지 src를 ghimg:<path> 로 변환 (절대 URL 등은 그대로 통과).
+ * ghimg: 스킴은 GhImage 컴포넌트에서 GitHub API로 인증된 URL로 교체된다.
+ */
+function resolveImageSrc(src: string, currentFilePath: string): string {
+  // 절대 URL, 프로토콜 상대(//), blob:, data:, 절대 경로(/), ghimg: 는 변환하지 않음
   if (
     /^https?:\/\//i.test(src) ||
     src.startsWith('//') ||
     src.startsWith('blob:') ||
     src.startsWith('data:') ||
-    src.startsWith('/')
+    src.startsWith('/') ||
+    src.startsWith('ghimg:')
   ) {
     return src
   }
   const dir = dirname(currentFilePath)
   const resolved = resolveRelativePath(dir, src)
-  return `${rawBaseUrl}/${encodeURI(resolved)}`
+  return `ghimg:${resolved}`
+}
+
+/**
+ * ghimg:<path> 스킴을 처리하는 이미지 컴포넌트.
+ * GitHub Contents API로 인증된 download_url을 가져와 렌더링한다.
+ * Private 저장소에서도 이미지가 표시된다.
+ */
+function GhImage({
+  src,
+  alt,
+  owner,
+  repo,
+  ...domProps
+}: React.ImgHTMLAttributes<HTMLImageElement> & { owner: string; repo: string }) {
+  const [resolvedUrl, setResolvedUrl] = useState<string | undefined>(undefined)
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => {
+    if (!src) return
+
+    if (!src.startsWith('ghimg:')) {
+      setResolvedUrl(src)
+      return
+    }
+
+    const path = src.slice('ghimg:'.length)
+    const cacheKey = `${owner}/${repo}/${path}`
+
+    const cached = imageUrlCache.get(cacheKey)
+    if (cached) {
+      setResolvedUrl(cached)
+      return
+    }
+
+    setResolvedUrl(undefined)
+    setFailed(false)
+    fetchImageUrl(owner, repo, path)
+      .then(({ downloadUrl }) => {
+        imageUrlCache.set(cacheKey, downloadUrl)
+        setResolvedUrl(downloadUrl)
+      })
+      .catch(() => setFailed(true))
+  }, [src, owner, repo])
+
+  if (failed) {
+    return <span className="text-xs text-red-400 font-mono">[이미지 로드 실패: {alt}]</span>
+  }
+  if (!resolvedUrl) {
+    return <span className="inline-block w-24 h-6 bg-gray-700 rounded animate-pulse" />
+  }
+  return <img src={resolvedUrl} alt={alt} {...domProps} />
 }
 
 export function MarkdownPreview({ content, currentFilePath, onNavigate, wrapperRef }: MarkdownPreviewProps) {
   const flatNodes = useTreeStore((s) => s.flatNodes)
   const allPaths = useMemo(() => flatNodes.map((n) => n.path), [flatNodes])
-  const { owner, repo, branch } = useRepoStore()
-  const rawBaseUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}`
+  const { owner, repo } = useRepoStore()
 
   const processed = useMemo(
-    () => replaceTagsForPreview(replaceWikiLinks(content, allPaths, rawBaseUrl)),
-    [content, allPaths, rawBaseUrl],
+    () => replaceTagsForPreview(replaceWikiLinks(content, allPaths)),
+    [content, allPaths],
   )
 
   const handleClick = useCallback(
@@ -77,13 +138,14 @@ export function MarkdownPreview({ content, currentFilePath, onNavigate, wrapperR
 
   const imgComponent = useMemo(
     () => ({
-      img: ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => {
+      // node prop (hast element)은 DOM에 전달하지 않도록 destructure해서 제거
+      img: ({ src, alt, node: _node, ...props }: React.ImgHTMLAttributes<HTMLImageElement> & { node?: unknown }) => {
         const resolvedSrc =
-          src && currentFilePath ? resolveImageSrc(src, currentFilePath, rawBaseUrl) : src
-        return <img src={resolvedSrc} alt={alt} {...props} />
+          src && currentFilePath ? resolveImageSrc(src, currentFilePath) : src
+        return <GhImage src={resolvedSrc} alt={alt} owner={owner} repo={repo} {...props} />
       },
     }),
-    [currentFilePath, rawBaseUrl],
+    [currentFilePath, owner, repo],
   )
 
   return (
